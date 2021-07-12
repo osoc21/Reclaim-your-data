@@ -1,12 +1,12 @@
 
-import React, {useState} from "react";
+import "./Login.css"
+import React from "react";
 
 // Import from "@inrupt/solid-client-authn-browser"
 import {
   login,
   handleIncomingRedirect,
   getDefaultSession,
-  fetch
 } from '@inrupt/solid-client-authn-browser';
 
 
@@ -17,7 +17,6 @@ function Login(props) {
 	let setWebId = props.setWebId;
 
 	// let MY_POD_URL = null;
-	let urlParentStack = [];
 	let session = null;
 
 	// 1a. Start Login Process. Call login() function.
@@ -66,7 +65,7 @@ function Login(props) {
 	// console.log(loggedIn);
 
 	return (
-	    <button onClick={loginToInruptDotCom}>Log-in</button>
+	    <button className="login-btn" onClick={loginToInruptDotCom}>Log-in</button>
 	);
 }
 

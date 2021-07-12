@@ -1,5 +1,21 @@
 
-.Login > p
+
+#root
 {
-  color: black;
+  display: block;
+  position:  relative;
+  min-height: 100vh;
+  background: rgb(224,224,227);
+  background: radial-gradient(circle, rgba(224,224,227,1) 1%,
+ rgba(213,219,226,0.9803454829197304) 52%, rgba(215,215,220,1) 100%);
+}
+
+.app-div
+{
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
