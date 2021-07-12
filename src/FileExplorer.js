@@ -19,10 +19,13 @@ import {
 
 
 
-function FileExplorer() {
+function FileExplorer(props) {
 
     let MY_POD_URL = null;
     let urlParentStack = [];
+    let webId = props.webId;
+
+    console.log(webId);
 
 
     const solidwebPattern = "https:\/\/(\w+\.)solidweb.org\/";
@@ -31,7 +34,9 @@ function FileExplorer() {
     
     function getPODUrl(provider)
     {
+        console.log(provider);
       const podURL = provider.match(tempPodPattern)[0];
+      console.log(podURL);
       return podURL;
     }
 
@@ -53,7 +58,7 @@ function FileExplorer() {
     } 
 
 
-    function ResourceLink(itemURL)
+    function resourceLink(itemURL)
     {
         return (
            <p class="pod-resource-link" 
@@ -68,7 +73,10 @@ function FileExplorer() {
         console.log("fetched files:");
         console.log(fetchedFiles,'\n');
 
-        let children = getThingAll(fetchedFiles);
+        let children = await getThingAll(fetchedFiles);
+
+        console.log("children: ");
+        console.log(children);
 
         // the first child element is self
         if (children.length > 1)
@@ -78,6 +86,9 @@ function FileExplorer() {
         }
         for (let item of children.slice(1, children.length))
         {
+            //<resourceLink/>
+            resourceLink(item);
+            /*
               console.log(item);
               let parNode = document.createElement("P");
               parNode.classList.add('pod-resource');
@@ -87,19 +98,23 @@ function FileExplorer() {
                   function(){getFilesFromResourceURL(parNode.textContent)}
               );
               fileViewerDiv.appendChild(parNode);
+              */
+              
         }
     }
+
 
 
     /** Fetch all files from the given path given relative to the root */
     async function getFiles() 
     {
         // TODO: remove hardcoded stuff
-        const webID = "https://pod.inrupt.com/wepodrom/profile/card#me";
-        MY_POD_URL = getPODUrl(webID);
+        
+        MY_POD_URL = getPODUrl(webId);
+        console.log("podURL: "+MY_POD_URL);
 
         // Parse ProfileDocument URI from the `webID` value.
-        const profileDocumentURI = webID.split('#')[0];
+        const profileDocumentURI = webId.split('#')[0];
         // document.getElementById("labelProfile").textContent = profileDocumentURI;
 
         getFilesFromResourceURL(MY_POD_URL);
@@ -116,6 +131,10 @@ function FileExplorer() {
         return "Nothing to display"
     }
 
+    let files = getFiles();
+
+    console.log(files);
+
     return (
         <div>
           <h1> You are logged in to your POD </h1>
@@ -123,9 +142,12 @@ function FileExplorer() {
             <button id="go-back">Go back</button>
             <p>Your files:</p>
             <div id="file-viewer">
-              <p><i>{getFileViewerContent()}</i></p>
+              <p><i>{webId}</i></p>
+             
             </div>
           </div>
         </div>
     );
 }
+
+export default FileExplorer;

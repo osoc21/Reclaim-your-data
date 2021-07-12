@@ -14,7 +14,7 @@ function Login(props) {
 	// let [loggedIn, setLoggedIn] = useState(false);
 	// 
 	let setLoggedIn = props.setLoggedIn;
-	let setWebID = props.setWebID;
+	let setWebId = props.setWebId;
 
 	// let MY_POD_URL = null;
 	let urlParentStack = [];
@@ -47,7 +47,7 @@ function Login(props) {
 	    // TODO: find a way to display the proper issuer after the redirect
 	    // document.getElementById("labelStatus").textContent = "You are connected to " + chosenIssuer;
 	    setLoggedIn(true);
-	    setWebID(session.info.webId);
+	    setWebId(session.info.webId);
 	    // document.getElementById("labelStatus").setAttribute("role", "alert");
 	  }
 	}
