@@ -77,7 +77,7 @@ function FileExplorer(props) {
         }
 
         return (
-           <p class="resource-link" 
+           <p className="resource-link" 
            onClick={open}>{url}</p>
         );
     }
@@ -135,8 +135,8 @@ function FileExplorer(props) {
     {
         console.log("plain get files");
         // TODO: remove hardcoded stuff
-        const HARDCODE_URL = "https://pod.inrupt.com/wepodrom/profile/card#me";
-        MY_POD_URL = getPODUrl(HARDCODE_URL); // webId
+        // const HARDCODE_URL = "https://pod.inrupt.com/wepodrom/profile/card#me";
+        MY_POD_URL = getPODUrl(webId); // webId
         console.log("podURL: " + MY_POD_URL);
 
         // Parse ProfileDocument URI from the `webID` value.

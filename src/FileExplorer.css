@@ -1,5 +1,11 @@
-#file-explorer > .resource-link:hover
+
+.resource-link
 {
-	border-bottom: 1px solid cyan;
-	color: #ddd;
+	padding-left: 5px;
+}
+
+.resource-link:hover
+{
+	border-left: 3px solid cyan;
+	color: cyan;
 }
