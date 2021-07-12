@@ -1,0 +1,5 @@
+#file-explorer > .resource-link:hover
+{
+	border-bottom: 1px solid cyan;
+	color: #ddd;
+}

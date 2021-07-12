@@ -8,10 +8,10 @@ function App() {
   let [loggedIn, setLoggedIn] = useState(false);
   let [webId, setWebId] = useState("");
 
-  console.log("App webId: "+webId);
+  console.log("App webId: "+ webId);
   return (
     <div>
-      {loggedIn ? <div><h1> You are logged in !!!</h1><h3>webID: {webId}</h3> <FileExplorer webId={webId}/> </div> :
+      {webId !== "" && loggedIn ? <div><h1> You are logged in !!!</h1><h3>webID: {webId}</h3> <FileExplorer webId={webId}/> </div> :
       <Login setLoggedIn={setLoggedIn} setWebId={setWebId}/>
       }
     </div>
