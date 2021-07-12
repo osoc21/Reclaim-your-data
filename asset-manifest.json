@@ -1,0 +1,28 @@
+{
+  "files": {
+    "main.css": "/Reclaim-your-data/static/css/main.2816c4e6.chunk.css",
+    "main.js": "/Reclaim-your-data/static/js/main.ddc538f5.chunk.js",
+    "main.js.map": "/Reclaim-your-data/static/js/main.ddc538f5.chunk.js.map",
+    "runtime-main.js": "/Reclaim-your-data/static/js/runtime-main.4a41e241.js",
+    "runtime-main.js.map": "/Reclaim-your-data/static/js/runtime-main.4a41e241.js.map",
+    "static/js/2.82746c72.chunk.js": "/Reclaim-your-data/static/js/2.82746c72.chunk.js",
+    "static/js/2.82746c72.chunk.js.map": "/Reclaim-your-data/static/js/2.82746c72.chunk.js.map",
+    "static/js/3.7f4aa736.chunk.js": "/Reclaim-your-data/static/js/3.7f4aa736.chunk.js",
+    "static/js/3.7f4aa736.chunk.js.map": "/Reclaim-your-data/static/js/3.7f4aa736.chunk.js.map",
+    "static/js/4.17c1a368.chunk.js": "/Reclaim-your-data/static/js/4.17c1a368.chunk.js",
+    "static/js/4.17c1a368.chunk.js.map": "/Reclaim-your-data/static/js/4.17c1a368.chunk.js.map",
+    "static/js/5.ea800a8b.chunk.js": "/Reclaim-your-data/static/js/5.ea800a8b.chunk.js",
+    "static/js/5.ea800a8b.chunk.js.map": "/Reclaim-your-data/static/js/5.ea800a8b.chunk.js.map",
+    "index.html": "/Reclaim-your-data/index.html",
+    "static/css/main.2816c4e6.chunk.css.map": "/Reclaim-your-data/static/css/main.2816c4e6.chunk.css.map",
+    "static/js/2.82746c72.chunk.js.LICENSE.txt": "/Reclaim-your-data/static/js/2.82746c72.chunk.js.LICENSE.txt",
+    "static/js/3.7f4aa736.chunk.js.LICENSE.txt": "/Reclaim-your-data/static/js/3.7f4aa736.chunk.js.LICENSE.txt",
+    "static/media/logo.6ce24c58.svg": "/Reclaim-your-data/static/media/logo.6ce24c58.svg"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.4a41e241.js",
+    "static/js/2.82746c72.chunk.js",
+    "static/css/main.2816c4e6.chunk.css",
+    "static/js/main.ddc538f5.chunk.js"
+  ]
+}
