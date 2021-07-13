@@ -51,7 +51,14 @@ function FileUpload(props) {
 
 
     function selectedFilesToReact() {
-        return selectedFiles.map(file => file.name);
+        let res = [];
+
+        // selectedFiles is iterable but not an array, so map() and forEach() functions don't work
+        for (let file of selectedFiles) {
+            res.push(file.name);
+        }
+
+        return res;
     }
 
     function showSelectedFiles() {
