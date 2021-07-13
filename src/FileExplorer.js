@@ -2,6 +2,9 @@
 import React, {useState} from "react";
 import GridView from "./GridView";
 
+
+import {Row, Col, Container} from 'react-bootstrap';
+
 import "./FileExplorer.css"
 
 // Import from "@inrupt/solid-client-authn-browser"
@@ -218,16 +221,22 @@ function FileExplorer(props) {
 
     let filePaths = fileArrayToReact();
     return (
-        <div>
-          <h1> You are logged in to your POD </h1>
-          <div id="file-explorer">
+        <Container>
+            <Row>
+            <h1> You are logged in to your POD </h1>
+            </Row>
+         <Row>
+         <div id="file-explorer">
             <button className="Button" id="go-back" onClick={fileExplorerGoBack}>Go back</button>
             <p>Files for current path ({currentPath}):</p>
-            <div id="file-viewer">
-              <GridView filePaths={filePaths}/>
-            </div>
           </div>
-        </div>
+
+         </Row>
+          
+         
+            <GridView filePaths={filePaths}/>
+         
+        </Container>
     );
 }
 

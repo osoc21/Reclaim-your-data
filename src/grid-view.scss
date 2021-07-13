@@ -1,5 +1,0 @@
-@use "@material/image-list";
-
-.custom-image-list{
-    @include image-list.standard-columns(3);
-}

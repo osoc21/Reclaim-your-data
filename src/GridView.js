@@ -1,13 +1,13 @@
 import React, {useState} from "react";
 
-import "./grid-view.scss";
+import {Shape, Card, Row, Col, CardGroup, Image, Container} from 'react-bootstrap';
 
-<link href="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.css" rel="stylesheet"></link>
+import "./grid-view.css";
 
 
 function GridView(props){
     //let filePaths = props.filePaths;
-    let filePaths = ["path1", "path2", "path3", "path4"];
+    let filePaths = ["path1", "path2", "path3", "path4", "path5"];
     let folderIcons = [];
 
 
@@ -16,22 +16,23 @@ function GridView(props){
 
     for(const [index, value] of filePaths.entries()){
         folderIcons.push(
-            <li class="mdc-image-list__item">
-                <div class="mdc-image-list__image-aspect-container">
-                    <img class="mdc-image-list__image" src="https://pod.inrupt.com/wepodrom/WePod/food/panCakes.jpg" />
-                </div>
-                <div class="mdc-image-list__supporting">
-                    <span class="mdc-image-list__label">Text label</span>
-                </div>
-             
-            </li> 
+            <Card>      
+                    <Image variant="top" src="https://pod.inrupt.com/wepodrom/WePod/food/panCakes.jpg" rounded/>
+                    <Card.Body>
+                        <Card.Title>Card title</Card.Title> 
+                    </Card.Body>
+     
+            </Card> 
         )
     }
 
     return(
-       <ul class = "mdc-image-list custom-image-list">
-        {folderIcons}
-       </ul>
+       
+            <Row xs={3} className="g-4">
+                {folderIcons}
+            </Row>
+
+        
     );
 }
 
