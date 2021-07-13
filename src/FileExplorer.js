@@ -5,22 +5,10 @@ import FileUpload from "./FileUpload"
 import "./FileExplorer.css"
 
 // Import from "@inrupt/solid-client-authn-browser"
-import {
-    fetch
-} from '@inrupt/solid-client-authn-browser';
+import {fetch} from '@inrupt/solid-client-authn-browser';
 
 // Import from "@inrupt/solid-client"
-import {
-    getSolidDataset,
-    getThingAll,
-    // write data
-    // setThing,
-    // saveSolidDatasetAt,
-    // added to upload image to pod
-    // saveFileInContainer,
-    // getSourceUrl,
-    // setStringNoLocale
-} from '@inrupt/solid-client';
+import {getSolidDataset, getThingAll,} from '@inrupt/solid-client';
 
 
 function FileExplorer(props) {
@@ -59,6 +47,7 @@ function FileExplorer(props) {
 
     function resourceLink(itemURL, setCurrentPath, uniqueKey) {
         let url = itemURL;
+        let resourceName = stripURL(url);
 
         function open() {
             if (url.endsWith("/")) {
@@ -75,8 +64,19 @@ function FileExplorer(props) {
         return (
             <p className="resource-link"
                onClick={open}
-               key={uniqueKey}><i>{url}</i></p>
+               key={uniqueKey}><i>{resourceName}</i></p>
         );
+    }
+
+    function stripURL(url) {
+        //Find the second-last '/', then keep the substring until that '/'
+        // this gives the new path url
+        let searchUpperBound = url.length;
+        if (url.endsWith('/')) {
+            searchUpperBound = url.length - 1
+        }
+        let slashPos = url.slice(0, searchUpperBound).lastIndexOf('/');
+        return url.slice(slashPos + 1, searchUpperBound);
     }
 
     /** Iterates on the file urls and returns an array of react components
