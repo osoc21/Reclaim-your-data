@@ -57,7 +57,7 @@ function FileExplorer(props) {
     }
 
 
-    function resourceLink(itemURL, setCurrentPath) {
+    function resourceLink(itemURL, setCurrentPath, uniqueKey) {
         let url = itemURL;
 
         function open() {
@@ -74,7 +74,8 @@ function FileExplorer(props) {
 
         return (
             <p className="resource-link"
-               onClick={open}><i>{url}</i></p>
+               onClick={open}
+               key={uniqueKey}><i>{url}</i></p>
         );
     }
 
@@ -84,9 +85,11 @@ function FileExplorer(props) {
         // the first child element is self
         if (files.length > 0) {
             let reactElems = [];
+            let i = 0;
 
             for (let item of files) {
-                reactElems.push(resourceLink(item.url, setCurrentPath));
+                reactElems.push(resourceLink(item.url, setCurrentPath, i));
+                i++;
             }
 
             return reactElems;
