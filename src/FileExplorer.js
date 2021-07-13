@@ -1,6 +1,8 @@
 
 import React, {useState} from "react";
 
+import FileUpload from "./FileUpload"
+
 import "./FileExplorer.css"
 
 // Import from "@inrupt/solid-client-authn-browser"
@@ -202,6 +204,7 @@ function FileExplorer(props) {
           <h1> You are logged in to your POD </h1>
           <div id="file-explorer">
             <button className="Button" id="go-back" onClick={fileExplorerGoBack}>Go back</button>
+            <FileUpload currentPath={currentPath}/>
             <p>Files for current path ({currentPath}):</p>
             <div id="file-viewer">
               <ul>{fileArrayToReact()}</ul>

@@ -1,8 +1,0 @@
-
-
-function FileDropArea()
-{
-	let droppedFiles = [];
-	
-}
-
