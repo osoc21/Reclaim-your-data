@@ -1,5 +1,6 @@
 
 import React, {useState} from "react";
+import GridView from "./GridView";
 
 import "./FileExplorer.css"
 
@@ -111,10 +112,13 @@ function FileExplorer(props) {
             });
         }
 
+        /*
         return (
            <p className="resource-link" 
            onClick={open}><i>{url}</i></p>
         );
+        */
+       return {"pathName": {url}, "open": {open}};
     }
 
     /** Iteraetes on the file urls and returns an array of react components
@@ -197,6 +201,7 @@ function FileExplorer(props) {
         getFiles();
     }
 
+    /*
     return (
         <div>
           <h1> You are logged in to your POD </h1>
@@ -205,6 +210,21 @@ function FileExplorer(props) {
             <p>Files for current path ({currentPath}):</p>
             <div id="file-viewer">
               <ul>{fileArrayToReact()}</ul>
+            </div>
+          </div>
+        </div>
+    );
+    */
+
+    let filePaths = fileArrayToReact();
+    return (
+        <div>
+          <h1> You are logged in to your POD </h1>
+          <div id="file-explorer">
+            <button className="Button" id="go-back" onClick={fileExplorerGoBack}>Go back</button>
+            <p>Files for current path ({currentPath}):</p>
+            <div id="file-viewer">
+              <GridView filePaths={filePaths}/>
             </div>
           </div>
         </div>
