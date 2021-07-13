@@ -35,7 +35,11 @@ function Login(props) {
 	// 1b. Login Redirect. Call handleIncomingRedirect() function.
 	// When redirected after login, finish the process by retrieving session information.
 	async function handleRedirectAfterLogin() {
-	  await handleIncomingRedirect();
+	  await handleIncomingRedirect(); /* TODO: add in handleIncomingRedirect function call (might not be necessary)
+		 {
+		  restorePreviousSession: true
+		}
+		*/
 
 	  session = getDefaultSession();
 
