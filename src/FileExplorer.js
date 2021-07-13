@@ -106,11 +106,15 @@ function FileExplorer(props) {
 
         function open()
         {
-            // its important to set the current path first !!
-            getFilesFromResourceURL(url).then((fileArray) => {
-                setCurrentPath(url);
-                setFiles(fileArray);
-            });
+            if (url[url.length - 1] === "/") {
+                // its important to set the current path first !!
+                getFilesFromResourceURL(url).then((fileArray) => {
+                    setCurrentPath(url);
+                    setFiles(fileArray);
+                });
+            } else {
+                alert("this is a file, handle it");
+            }
         }
 
         return (
