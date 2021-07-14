@@ -5,8 +5,11 @@ import FileExplorer from "./FileExplorer";
 import FileUpload from "./FileUpload";
 import React, {useState} from "react";
 
+
 import {
-  BrowserRouter,
+  // Import Router and not BrowserRouter, otherwise history.push()
+  // will update the url displayed in the browser but will not re-render afterwards
+  Router,
   Switch,
   Route,
   Link,
@@ -33,7 +36,7 @@ function App() {
     }
 
     return (
-        <BrowserRouter history={history}>
+        <Router history={history}>
           <div className="app-div">
             <Switch>
                 <Route path="/login">
@@ -49,6 +52,7 @@ function App() {
                 <Route path="/home">
                     <button className="Button" onClick={() => history.goBack()}>Go back</button>
                     {isLoggedIn() ? <Home webId={webId}
+                    history={history}
                     explorerPath={explorerPath}
                     setExplorerPath={setExplorerPath}/> : <Redirect to="/"/>}
                 </Route>
@@ -57,7 +61,7 @@ function App() {
                 </Route>
             </Switch>
           </div>
-        </BrowserRouter>
+        </Router>
     );
 }
 
@@ -66,14 +70,21 @@ function Home(props)
     let webId = props.webId;
     let match = useRouteMatch();
 
+    function gotoFileUpload()
+    {
+        console.log("goto file upload screen ...");
+        props.history.replace(`${match.url}/upload`);
+        // props.history.goForward();
+    }
+
     return (
         <div>
             <h1>You are logged in !!!</h1>
             <h3>webID: {webId}</h3>
-            <button className="Button">
-                <Link to={`${match.url}/upload`}>
-                    Upload files
-                </Link>
+            <button className="Button" onClick={gotoFileUpload}>
+                Upload files
+                {/*<Link to={`${match.url}/upload`}>
+                </Link>*/}
             </button>
             <FileExplorer webId={webId} explorerPath={props.explorerPath}
             setExplorerPath={props.setExplorerPath}/>
