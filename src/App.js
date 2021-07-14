@@ -18,17 +18,12 @@ import {
   useRouteMatch
 } from "react-router-dom";
 
-// import { createBrowserHistory } from 'history';
-
-// const history = useRouterHistory(createBrowserHistory)({basename: "/login"});
 
 function App() {
     let [loggedIn, setLoggedIn] = useState(false);
     let [webId, setWebId] = useState("");
     let [explorerPath, setExplorerPath] = useState("");
     let history = useHistory();
-    // history.push("/login");
-    
 
     function isLoggedIn()
     {

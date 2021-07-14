@@ -45,7 +45,6 @@ function Login(props) {
 
 	  if (session.info.isLoggedIn) {
 	    console.log("logged in");
-	    console.log(session);
 	    // Update the page with the status.
 	    // TODO: find a way to display the proper issuer after the redirect
 	    // document.getElementById("labelStatus").textContent = "You are connected to " + chosenIssuer;
