@@ -219,12 +219,8 @@ function FileExplorer(props) {
     );
     */
 
-    let filePaths = fileArrayToReact();
     return (
         <Container>
-            <Row>
-            <h1> You are logged in to your POD </h1>
-            </Row>
          <Row>
          <div id="file-explorer">
             <button className="Button" id="go-back" onClick={fileExplorerGoBack}>Go back</button>
@@ -234,7 +230,11 @@ function FileExplorer(props) {
          </Row>
           
          
-            <GridView filePaths={filePaths}/>
+            <GridView files={files}/>
+
+       
+         
+           
          
         </Container>
     );
