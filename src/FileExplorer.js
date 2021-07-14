@@ -124,6 +124,15 @@ function FileExplorer(props) {
        return {"pathName": {url}, "open": {open}};
     }
 
+    function openLink(url)
+        {
+            // its important to set the current path first !!
+            getFilesFromResourceURL(url).then((fileArray) => {
+                setCurrentPath(url);
+                setFiles(fileArray);
+            });
+        }
+
     /** Iteraetes on the file urls and returns an array of react components
      * in the form of resourceLink elements  */
     function fileArrayToReact()
@@ -230,7 +239,7 @@ function FileExplorer(props) {
          </Row>
           
          
-            <GridView files={files}/>
+            <GridView files={files} openLink={openLink}/>
 
        
          
