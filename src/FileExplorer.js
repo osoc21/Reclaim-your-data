@@ -20,7 +20,11 @@ function FileExplorer(props) {
     const MY_POD_URL = getPODUrl(webId);
 
     let [files, setFiles] = useState([]);
-    let [currentPath, setCurrentPath] = useState(MY_POD_URL);
+
+    // let [currentPath, setCurrentPath] = useState(MY_POD_URL);
+    let currentPath = props.explorerPath;
+    let setCurrentPath = props.setExplorerPath;
+    setCurrentPath(MY_POD_URL);
 
     function getPODUrl(myWebId) {
         const podURL = myWebId.match(tempPodPattern)[0];
@@ -134,7 +138,6 @@ function FileExplorer(props) {
             <h1> You are logged in to your POD </h1>
             <div id="file-explorer">
                 <button className="Button" id="go-back" onClick={fileExplorerGoBack}>Go back</button>
-                <FileUpload currentPath={currentPath}/>
                 <p>Files for current path ({currentPath}):</p>
                 <div id="file-viewer">
                     <ul>{fileArrayToReact()}</ul>

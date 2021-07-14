@@ -72,6 +72,7 @@ function FileUpload(props) {
 
     return (
         <div>
+            <h1>Upload files to {currentPath}</h1>
             <button className="Button" onClick={openFileSelectionWindow}>Add file(s)</button>
             {showSelectedFiles()}
             <button className="Button" onClick={upload}>Upload</button>
