@@ -69,7 +69,9 @@ function Login(props) {
 	// console.log(loggedIn);
 
 	return (
-	    <button className="login-btn" onClick={loginToInruptDotCom}>Log-in</button>
+			<div className="login-frame">
+	    	<button className="login-btn" onClick={loginToInruptDotCom}>Log-in</button>
+    	</div>
 	);
 }
 

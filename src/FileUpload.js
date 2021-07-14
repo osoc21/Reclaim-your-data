@@ -75,11 +75,12 @@ function FileUpload(props) {
             <button className="Button" onClick={openFileSelectionWindow}>Add file(s)</button>
             {showSelectedFiles()}
             <button className="Button" onClick={upload}>Upload</button>
-            <input id="file-input" type="file" name="fileUploadInput"
-                   className="file-selection"
-                   onChange={(e) => {
+            <input id="file-input" type="file" multiple="multiple"
+                name="fileUploadInput"
+                className="file-selection"
+                onChange={(e) => {
                        setSelectedFiles(e.target.files);
-                   }}/>
+                }}/>
         </div>
     );
 }
