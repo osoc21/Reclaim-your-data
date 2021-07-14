@@ -21,10 +21,10 @@ function GridView(props){
     }
 
     function getName(url){
-        let regex = /https:\/\/pod\.inrupt\.com\/\w+\/(\w+)/;
+        let regex = /^https:\/\/pod\.inrupt\.com(\/\w+)*\/(\w+)/;
         const match = url.match(regex);
         console.log(match);
-        return match[1];
+        return match[match.length - 1];
     }
 
 
