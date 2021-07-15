@@ -35,13 +35,16 @@ function Login(props) {
 	// 1b. Login Redirect. Call handleIncomingRedirect() function.
 	// When redirected after login, finish the process by retrieving session information.
 	async function handleRedirectAfterLogin() {
-	  await handleIncomingRedirect();
+	  await handleIncomingRedirect(); /* TODO: add in handleIncomingRedirect function call (might not be necessary)
+		 {
+		  restorePreviousSession: true
+		}
+		*/
 
 	  session = getDefaultSession();
 
 	  if (session.info.isLoggedIn) {
 	    console.log("logged in");
-	    console.log(session);
 	    // Update the page with the status.
 	    // TODO: find a way to display the proper issuer after the redirect
 	    // document.getElementById("labelStatus").textContent = "You are connected to " + chosenIssuer;
@@ -65,7 +68,9 @@ function Login(props) {
 	// console.log(loggedIn);
 
 	return (
-	    <button className="login-btn" onClick={loginToInruptDotCom}>Log-in</button>
+			<div className="login-frame">
+	    	<button className="login-btn" onClick={loginToInruptDotCom}>Log-in</button>
+    	</div>
 	);
 }
 

@@ -6,7 +6,6 @@
     "@inrupt/solid-client": "^1.10.0",
     "@inrupt/solid-client-authn-browser": "^1.9.1",
     "@inrupt/vocab-common-rdf": "^0.7.4",
-    "@material/image-list": "^11.0.0",
     "@testing-library/jest-dom": "^5.11.4",
     "@testing-library/react": "^11.1.0",
     "@testing-library/user-event": "^12.1.10",
@@ -16,6 +15,7 @@
     "react": "^17.0.2",
     "react-bootstrap": "^1.6.1",
     "react-dom": "^17.0.2",
+    "react-router-dom": "^5.2.0",
     "react-scripts": "4.0.3",
     "web-vitals": "^1.0.1",
     "webpack": "^4.44.2"

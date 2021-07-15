@@ -1,4 +1,3 @@
-
 import React, {useState} from "react";
 import GridView from "./GridView";
 
@@ -8,145 +7,127 @@ import {Row, Col, Container} from 'react-bootstrap';
 import "./FileExplorer.css"
 
 // Import from "@inrupt/solid-client-authn-browser"
-import {
-  fetch
-} from '@inrupt/solid-client-authn-browser';
+import {fetch} from '@inrupt/solid-client-authn-browser';
 
 // Import from "@inrupt/solid-client"
-import {
-  getSolidDataset,
-  getThingAll,
-  // write data
-  // setThing,
-  // saveSolidDatasetAt,
-  // added to upload image to pod
-  // saveFileInContainer, 
-  // getSourceUrl,
-  // setStringNoLocale
-} from '@inrupt/solid-client';
+import {getSolidDataset, getThingAll} from '@inrupt/solid-client';
 
-
+import {getPODUrlFromWebId} from './pod';
 
 
 function FileExplorer(props) {
-    const solidwebPattern = "https:\/\/(\w+\.)solidweb.org\/";
-    const podInruptPattern = "https:\/\/pod\.inrupt\.com\/\w+\/";
-    const tempPodPattern = /https:\/\/(\w+\.)solidweb.org\/|https:\/\/pod\.inrupt\.com\/\w+\//;
-
     let webId = props.webId;
-    // console.log("webid:", webId);
-    const MY_POD_URL = getPODUrl(webId);
-    // console.log("podURL: " + MY_POD_URL);
+    const MY_POD_URL = getPODUrlFromWebId(webId);
 
     let [files, setFiles] = useState([]);
-    let [currentPath, setCurrentPath] = useState(MY_POD_URL);
-    
+    let [loading, setLoading] = useState(false);
 
-    function getPODUrl(myWebId)
+    // let [currentPath, setCurrentPath] = useState(MY_POD_URL);
+    let currentPath = props.explorerPath;
+    let setCurrentPath = props.setExplorerPath;
+
+    if (currentPath === "")
     {
-        const podURL = myWebId.match(tempPodPattern)[0];
-        return podURL;
+        setCurrentPath(MY_POD_URL);
     }
 
-    /** Splits the current path using the last '/' if it's a file,
-     * or the second last '/' if it's a folder.
-     */
-    // function getCurrentPathSplit()
-    // {
-    //     let res = null;
-
-    //     //Find the second-last '/', then keep the substring until that '/'
-    //     // this gives the new path url
-    //     if (currentPath.length > 1)
-    //     {
-    //         let searchUpperBound = currentPath.length;
-    //         if (currentPath[currentPath.length - 1] === '/')
-    //         {
-    //             searchUpperBound = currentPath.length - 1
-    //         }
-    //         let slashPos = currentPath.slice(0, searchUpperBound).lastIndexOf('/');
-    //         let left = currentPath.slice(slashPos + 1, searchUpperBound);
-    //         let right = currentPath.slice(0, slashPos + 1);
-    //         res = {parentPath: left, currentFolder: right};
-    //     }
-
-    //     return res;
-
-    // }
-
-    function fileExplorerGoBack()
+    function openFolder(myUrl)
     {
-        console.log("*******");
-        console.log("current path:", currentPath);
-        if (currentPath.length > MY_POD_URL.length && currentPath !== MY_POD_URL)
+        setLoading(true);
+        // its important to set the current path first !!
+        getFilesFromResourceURL(myUrl).then((fileArray) => {
+            setCurrentPath(myUrl);
+            setFiles(fileArray);
+            setLoading(false);
+        });
+    }
+
+
+    function fileExplorerGoBack() 
+    {
+        if (currentPath.length > MY_POD_URL.length && currentPath !== MY_POD_URL) 
         {
-            // urlParentStack.pop(); // remove the current dir from the stack
-            // let url = urlParentStack[urlParentStack.length-1];
-            
             // find the second-last '/', then keep the substring until that '/'
             // this gives the new path url
             let lastSlashPos = currentPath.slice(0, -1).lastIndexOf('/');
             let newPath = currentPath.slice(0, lastSlashPos + 1)
-            console.log("going back to " + newPath + " ...");
 
-            // its important to set the current path first !!
-            getFilesFromResourceURL(newPath).then((fileArray) => {
-                setCurrentPath(newPath);
-                setFiles(fileArray);
-            });
-        }
-        else
+            openFolder(newPath);
+           
+        } 
+        else 
         {
             alert("Cannot go back from POD root.");
         }
-    } 
+    }
 
 
-    function resourceLink(itemURL, setCurrentPath)
-    {
+    function resourceLink(itemURL, setCurrentPath, uniqueKey) {
         let url = itemURL;
+        let resourceName = stripURL(url);
 
-        function open()
+        function open() 
         {
-            // its important to set the current path first !!
-            getFilesFromResourceURL(url).then((fileArray) => {
-                setCurrentPath(url);
-                setFiles(fileArray);
-            });
+            if (url.endsWith("/")) 
+            {
+                console.log("opening " + url + " ...");
+                openFolder(url);
+            } 
+            else 
+            {
+                alert("this is a file, handle it");
+            }
         }
 
         /*
         return (
-           <p className="resource-link" 
-           onClick={open}><i>{url}</i></p>
+            <p className="resource-link"
+               onClick={open}
+               key={uniqueKey}><i>{resourceName}</i></p>
         );
         */
        return {"pathName": {url}, "open": {open}};
     }
 
+    /** Iteraetes on the file urls and returns an array of react components */
+    function stripURL(url) {
+        //Find the second-last '/', then keep the substring until that '/'
+        // this gives the new path url
+        let searchUpperBound = url.length;
+        if (url.endsWith('/')) {
+            searchUpperBound = url.length - 1
+        }
+        let slashPos = url.slice(0, searchUpperBound).lastIndexOf('/');
+        return url.slice(slashPos + 1, searchUpperBound);
+    }
+
+    
     function openLink(url)
+    {
+        // its important to set the current path first !!
+        getFilesFromResourceURL(url).then((fileArray) => {
+            setCurrentPath(url);
+            setFiles(fileArray);
+        });
+    }
+
+
+    /** Iterates on the file urls and returns an array of react components
+     * in the form of resourceLink elements  */
+    function fileArrayToReact() {
+        if (loading)
         {
-            // its important to set the current path first !!
-            getFilesFromResourceURL(url).then((fileArray) => {
-                setCurrentPath(url);
-                setFiles(fileArray);
-            });
+            return <div className="loader"></div> 
         }
 
-    /** Iteraetes on the file urls and returns an array of react components
-     * in the form of resourceLink elements  */
-    function fileArrayToReact()
-    {
-        console.log("file array to react");
-
         // the first child element is self
-        if (files.length > 0)
-        {
+        if (files.length > 0) {
             let reactElems = [];
+            let i = 0;
 
-            for (let item of files)
-            {
-                reactElems.push(resourceLink(item.url, setCurrentPath));
+            for (let item of files) {
+                reactElems.push(resourceLink(item.url, setCurrentPath, i));
+                i++;
             }
 
             return reactElems;
@@ -155,49 +136,24 @@ function FileExplorer(props) {
         return <p><i>Nothing to display</i></p>;
     }
 
-
-    async function getFilesFromResourceURL(url)
-    {
-        console.log("get files from " + url);
-        const fetchedFiles = await getSolidDataset(url, { fetch: fetch });
-        // console.log("fetched files:");
-        // console.log(fetchedFiles,'\n');
+    async function getFilesFromResourceURL(url) {
+        const fetchedFiles = await getSolidDataset(url, {fetch: fetch});
 
         let children = await getThingAll(fetchedFiles);
-
-        // console.log("children: ");
-        // console.log(children);
 
         let res = []
 
         // note: the first child element is self
-        if (children.length > 1)
-        {
+        if (children.length > 1) {
             res = children.slice(1, children.length)
         }
 
-        console.log("files obtained:");
-        console.log(res);
         return res;
-
     }
 
-
-
     /** Fetch all files from the given path given relative to the root */
-    async function getFiles() 
-    {
-        console.log("GETTING FILES");
-        // console.log("plain get files");
-        // TODO: remove hardcoded stuff
-        // const HARDCODE_URL = "https://pod.inrupt.com/wepodrom/profile/card#me";
-        // MY_POD_URL = getPODUrl(webId); // webId
-        
-
-        // Parse ProfileDocument URI from the `webID` value.
-        // const profileDocumentURI = webId.split('#')[0];
-        // document.getElementById("labelProfile").textContent = profileDocumentURI;
-
+    function getRootFiles() {
+        // openFolder(MY_POD_URL);
         getFilesFromResourceURL(MY_POD_URL).then((fileArray) => {
             setCurrentPath(MY_POD_URL);
             setFiles(fileArray);
@@ -208,43 +164,38 @@ function FileExplorer(props) {
     // only read files if not already in the array (avoid infinite refreshes !!!)
     // but also if the current path is the root (it's possible that we're not in the
     // root but the current path contains no file e.g. empty folder)
-    if ((files.length === 0) && (currentPath === MY_POD_URL))
+    if ((files.length === 0) && (currentPath === MY_POD_URL)) 
     {
-        getFiles();
+        // Don't use animation here as FileExplorer might already
+        // be rendering and updating too many properties
+        // at that time might cause 'too many rerenders'
+        getRootFiles();
     }
 
     /*
     return (
         <div>
-          <h1> You are logged in to your POD </h1>
-          <div id="file-explorer">
-            <button className="Button" id="go-back" onClick={fileExplorerGoBack}>Go back</button>
-            <p>Files for current path ({currentPath}):</p>
-            <div id="file-viewer">
-              <ul>{fileArrayToReact()}</ul>
+            <h1> You are logged in to your POD </h1>
+            <div id="file-explorer">
+                <button className="Button" id="go-back" onClick={fileExplorerGoBack}>Go back</button>
+                <p>Files for current path ({currentPath}):</p>
+                <div id="file-viewer">
+                    <ul>{fileArrayToReact()}</ul>
+                </div>
             </div>
-          </div>
         </div>
     );
     */
 
     return (
         <Container>
-         <Row>
-         <div id="file-explorer">
-            <button className="Button" id="go-back" onClick={fileExplorerGoBack}>Go back</button>
-            <p>Files for current path ({currentPath}):</p>
-          </div>
-
-         </Row>
-          
-         
+            <Row>
+                <div id="file-explorer">
+                    <button className="Button" id="go-back" onClick={fileExplorerGoBack}>Go back</button>
+                    <p>Files for current path ({currentPath}):</p>
+                </div>
+            </Row>
             <GridView files={files} openLink={openLink}/>
-
-       
-         
-           
-         
         </Container>
     );
 }
