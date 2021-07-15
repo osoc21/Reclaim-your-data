@@ -62,7 +62,7 @@ function App() {
                 {isLoggedIn() ? <Redirect to="/"/> : null} 
             </Route>
             <Route path="/home/upload">
-                {isLoggedIn() ? <div><button className="Button" onClick={() => history.goBack()}>Go back</button>
+                {isLoggedIn() ? <div><MenuBar classes={classes} history={history}/>
                     <FileUpload explorerPath={explorerPath}/></div> : <Redirect to={"/"} />
                 }
             </Route>
@@ -129,8 +129,8 @@ function Home(props)
 
     return (
         <div>
-            <h1>You are logged in !!!</h1>
-            <h3>webID: {webId}</h3>
+            <h1>Home</h1>
+            {/*<h3>webID: {webId}</h3>*/}
             <FileExplorer webId={webId} explorerPath={props.explorerPath}
             setExplorerPath={props.setExplorerPath}/>
             <Fab className={classes.fab} color="primary" 
