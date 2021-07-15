@@ -16,6 +16,8 @@ import "./grid-view.css";
 
 import exif from 'exif-js';
 
+import dms2dec from 'dms2dec';
+
 
 function GridView(props){
     let files = props.files;
@@ -68,8 +70,11 @@ function GridView(props){
                 let longitude = exifData.GPSLongitude && exifData.GPSLongitude[0] ? exifData.GPSLongitude : null
                 console.log(`exifdata`);
                 console.log(dateTime);
-                console.log(latitude);
-                console.log(longitude);
+                if (latitude != null && longitude != null) {
+                    // note: the dms2dec lib expects 4 parameters, but we haven't found a way to parse if the picture
+                    // was taken in the NESW direction, so at the moment it's hardcoded
+                    console.log(dms2dec(latitude, "N", longitude, "E"));
+                }
             }
 
             processedEntry.imageUrl = imageUrl;

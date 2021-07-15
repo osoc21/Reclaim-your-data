@@ -4496,6 +4496,11 @@
   dependencies:
     "path-type" "^4.0.0"
 
+"dms2dec@^1.1.0":
+  "integrity" "sha1-pgtDcxGUkniGt0uo28p2Lvv+hHw="
+  "resolved" "https://registry.npmjs.org/dms2dec/-/dms2dec-1.1.0.tgz"
+  "version" "1.1.0"
+
 "dns-equal@^1.0.0":
   "integrity" "sha1-s55/HabrCnW6nBcySzR1PEfgZU0="
   "resolved" "https://registry.npmjs.org/dns-equal/-/dns-equal-1.0.0.tgz"
