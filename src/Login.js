@@ -2,6 +2,8 @@
 import "./Login.css"
 import React from "react";
 
+import {Button} from '@material-ui/core';
+
 // Import from "@inrupt/solid-client-authn-browser"
 import {
   login,
@@ -43,8 +45,8 @@ function Login(props) {
 	handleRedirectAfterLogin();
 
 	return (
-			<div className="login-frame">
-	    	<button className="login-btn" onClick={loginToInruptDotCom}>Log-in</button>
+		<div className="login-frame">
+	    	<Button size="large" variant="contained" color="primary" onClick={loginToInruptDotCom}>Log-in</Button>
     	</div>
 	);
 }

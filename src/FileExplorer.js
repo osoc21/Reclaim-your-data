@@ -2,7 +2,6 @@ import React, {useState} from "react";
 import GridView from "./GridView";
 
 
-import {Row, Col, Container} from 'react-bootstrap';
 
 import "./FileExplorer.css"
 
@@ -13,6 +12,9 @@ import {fetch} from '@inrupt/solid-client-authn-browser';
 import {getSolidDataset, getThingAll} from '@inrupt/solid-client';
 
 import {getPODUrlFromWebId} from './pod';
+
+import {Container, Box} from '@material-ui/core';
+import AddIcon from '@material-ui/icons/Add';
 
 
 function FileExplorer(props) {
@@ -166,12 +168,12 @@ function FileExplorer(props) {
 
     return (
         <Container>
-            <Row>
+            <Box>
                 <div id="file-explorer">
                     <button className="Button" id="go-back" onClick={fileExplorerGoBack}>Go back</button>
                     <p>Files for current path ({currentPath}):</p>
                 </div>
-            </Row>
+            </Box>
             <GridView files={files} openLink={openLink}/>
         </Container>
     );
