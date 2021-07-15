@@ -14,6 +14,8 @@ import {Shape, Card, Row, Col, CardGroup, Image, Container} from 'react-bootstra
 
 import "./grid-view.css";
 
+import exif from 'exif-js';
+
 
 function GridView(props){
     let files = props.files;
@@ -35,17 +37,17 @@ function GridView(props){
     function getName(url){
         let regex = /^https:\/\/pod\.inrupt\.com(\/\w+)*\/(\w+)/;
         const match = url.match(regex);
-        console.log(match);
+        //console.log(match);
         return match[match.length - 1];
     }
 
     async function fetchSomeData(files) {
-        console.log("Fetching");
-        console.log(files);
+        //console.log("Fetching");
+        //console.log(files);
         let processedUrls = [];
-    
+
         for (const entry of files) {
-          console.log(entry);
+          //console.log(entry);
           let processedEntry = {
             url: entry.url,
             shortName: getName(entry.url),
@@ -53,10 +55,23 @@ function GridView(props){
             imageUrl: null,
           };
           processedUrls.push(processedEntry);
-    
+
           if (isImage(processedEntry.url)) {
             let raw = await getFile(processedEntry.url, { fetch: fetch });
             let imageUrl = URL.createObjectURL(raw);
+
+            let arrayBuffer = await new Response(raw).arrayBuffer();
+            let exifData = exif.readFromBinaryFile(arrayBuffer);
+            if (exifData) {
+                let dateTime = exifData.DateTime ? exifData.DateTime.replace(":","/").replace(":","/") : undefined
+                let latitude = exifData.GPSLatitude && exifData.GPSLatitude[0] ? exifData.GPSLatitude : null
+                let longitude = exifData.GPSLongitude && exifData.GPSLongitude[0] ? exifData.GPSLongitude : null
+                console.log(`exifdata`);
+                console.log(dateTime);
+                console.log(latitude);
+                console.log(longitude);
+            }
+
             processedEntry.imageUrl = imageUrl;
           }
         }
@@ -64,20 +79,20 @@ function GridView(props){
       }
 
       useEffect(() => {
-        fetchSomeData(props.files)
+        fetchSomeData(props.files);
       }, [props.files]);
-    
+
     function renderEntry(folderEntry){
         let result = null;
 
 
-        console.log("imageUrl: " + folderEntry.imageUrl);
+        //console.log("imageUrl: " + folderEntry.imageUrl);
 
         if(folderEntry.isFolderBoolean || !isImage(folderEntry.url)){
             result = <p onClick={() => openLink(folderEntry.url)}>
             <svg xmlns="http://www.w3.org/2000/svg"  fill="currentColor" class="bi bi-folder" viewBox="0 0 16 16">
                 <path d="M.54 3.87.5 3a2 2 0 0 1 2-2h3.672a2 2 0 0 1 1.414.586l.828.828A2 2 0 0 0 9.828 3h3.982a2 2 0 0 1 1.992 2.181l-.637 7A2 2 0 0 1 13.174 14H2.826a2 2 0 0 1-1.991-1.819l-.637-7a1.99 1.99 0 0 1 .342-1.31zM2.19 4a1 1 0 0 0-.996 1.09l.637 7a1 1 0 0 0 .995.91h10.348a1 1 0 0 0 .995-.91l.637-7A1 1 0 0 0 13.81 4H2.19zm4.69-1.707A1 1 0 0 0 6.172 2H2.5a1 1 0 0 0-1 .981l.006.139C1.72 3.042 1.95 3 2.19 3h5.396l-.707-.707z"/>
-            </svg> 
+            </svg>
 
         </p>
         } else if(folderEntry.imageUrl){
@@ -90,31 +105,44 @@ function GridView(props){
             </svg>
 
         }
+
         return result;
     }
+
+    /*async function displayExif() {
+        for (let img of folderImages) {
+            if (isImage(img.url)) {
+                let raw = await getFile(img.url);
+
+
+            }
+        }
+    }*/
 
     return(
         <Row xs={3} className="g-4">
             {folderImages.map((folderEntry, index) => (
                 <Card>
                         {renderEntry(folderEntry)}
-                        
+
                             <Card.Body>
                                 <Card.Title>
                                     <p onClick={() => openLink(folderEntry.url)}>
                                     {folderEntry.shortName}
                                     </p>
-                                </Card.Title> 
+                                </Card.Title>
                             </Card.Body>
-            
-                    </Card> 
+
+
+                    </Card>
 
             ))}
-                  
-        
 
-              
-        </Row>    
+
+
+
+        </Row>
+
     );
 }
 
