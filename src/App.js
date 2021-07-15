@@ -30,33 +30,31 @@ function App() {
     }
 
     return (
-        <Router history={history}>
-          <div className="app-div">
-            <Switch>
-                <Route path="/login">
-                    <Login setWebId={setWebId} setLoggedIn={setLoggedIn}/>
-                    {/* We execute this separately and after the login, this allows
-                    an automatic redirect to '/home' when we come back from login form. */}
-                    {isLoggedIn() ? <Redirect to="/"/> : null} 
-                </Route>
-                <Route path="/home/upload">
-                    {isLoggedIn() ? <div><button className="Button" onClick={() => history.goBack()}>Go back</button>
-                        <FileUpload explorerPath={explorerPath}/></div> : <Redirect to={"/"} />
-                    }
-                </Route>
-                <Route path="/home">
-                    <button className="Button" onClick={() => history.goBack()}>Go back</button>
-                    {isLoggedIn() ? <Home webId={webId}
-                    history={history}
-                    explorerPath={explorerPath}
-                    setExplorerPath={setExplorerPath}/> : <Redirect to="/"/>}
-                </Route>
-                <Route path="/">
-                    {isLoggedIn() ? <Redirect push to="/home"/> : <Redirect push to="/login"/>}
-                </Route>
-            </Switch>
-          </div>
-        </Router>
+    <div className="app-div">
+        <Switch>
+            <Route path="/login">
+                <Login setWebId={setWebId} setLoggedIn={setLoggedIn}/>
+                {/* We execute this separately and after the login, this allows
+                an automatic redirect to '/home' when we come back from login form. */}
+                {isLoggedIn() ? <Redirect to="/"/> : null} 
+            </Route>
+            <Route path="/home/upload">
+                {isLoggedIn() ? <div><button className="Button" onClick={() => history.goBack()}>Go back</button>
+                    <FileUpload explorerPath={explorerPath}/></div> : <Redirect to={"/"} />
+                }
+            </Route>
+            <Route path="/home">
+                <button className="Button" onClick={() => history.goBack()}>Go back</button>
+                {isLoggedIn() ? <Home webId={webId}
+                history={history}
+                explorerPath={explorerPath}
+                setExplorerPath={setExplorerPath}/> : <Redirect to="/"/>}
+            </Route>
+            <Route path="/">
+                {isLoggedIn() ? <Redirect push to="/home"/> : <Redirect push to="/login"/>}
+            </Route>
+        </Switch>
+    </div>
     );
 }
 
