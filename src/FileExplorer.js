@@ -22,7 +22,6 @@ function FileExplorer(props) {
     let [files, setFiles] = useState([]);
     let [loading, setLoading] = useState(false);
 
-    // let [currentPath, setCurrentPath] = useState(MY_POD_URL);
     let currentPath = props.explorerPath;
     let setCurrentPath = props.setExplorerPath;
 
@@ -79,13 +78,6 @@ function FileExplorer(props) {
             }
         }
 
-        /*
-        return (
-            <p className="resource-link"
-               onClick={open}
-               key={uniqueKey}><i>{resourceName}</i></p>
-        );
-        */
        return {"pathName": {url}, "open": {open}};
     }
 
@@ -101,7 +93,7 @@ function FileExplorer(props) {
         return url.slice(slashPos + 1, searchUpperBound);
     }
 
-    
+
     function openLink(url)
     {
         // its important to set the current path first !!
@@ -153,7 +145,6 @@ function FileExplorer(props) {
 
     /** Fetch all files from the given path given relative to the root */
     function getRootFiles() {
-        // openFolder(MY_POD_URL);
         getFilesFromResourceURL(MY_POD_URL).then((fileArray) => {
             setCurrentPath(MY_POD_URL);
             setFiles(fileArray);
@@ -172,20 +163,6 @@ function FileExplorer(props) {
         getRootFiles();
     }
 
-    /*
-    return (
-        <div>
-            <h1> You are logged in to your POD </h1>
-            <div id="file-explorer">
-                <button className="Button" id="go-back" onClick={fileExplorerGoBack}>Go back</button>
-                <p>Files for current path ({currentPath}):</p>
-                <div id="file-viewer">
-                    <ul>{fileArrayToReact()}</ul>
-                </div>
-            </div>
-        </div>
-    );
-    */
 
     return (
         <Container>

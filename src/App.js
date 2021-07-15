@@ -1,4 +1,3 @@
-// import logo from './logo.svg';
 import './App.css';
 import Login from "./Login";
 import FileExplorer from "./FileExplorer";
@@ -70,7 +69,6 @@ function Home(props)
     {
         console.log("goto file upload screen ...");
         props.history.replace(`${match.url}/upload`);
-        // props.history.goForward();
     }
 
     return (
@@ -79,17 +77,9 @@ function Home(props)
             <h3>webID: {webId}</h3>
             <button className="Button" onClick={gotoFileUpload}>
                 Upload files
-                {/*<Link to={`${match.url}/upload`}>
-                </Link>*/}
             </button>
             <FileExplorer webId={webId} explorerPath={props.explorerPath}
             setExplorerPath={props.setExplorerPath}/>
-            {/**/}
-            {/*<Switch>
-                <Route path={`${match.url}/upload`}>
-                    <FileUpload explorerPath={props.explorerPath}/>
-                </Route>
-            </Switch>*/}
         </div>
     );
 }
