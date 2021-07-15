@@ -19,6 +19,7 @@ function GridView(props){
     let files = props.files;
     let folderIcons = [];
     let openLink = props.openLink;
+    const [folderImages, setFolderImages] = useState([]);
 
 
 
@@ -38,40 +39,34 @@ function GridView(props){
         return match[match.length - 1];
     }
 
-    function getImage(entry){
-        getFile(
-            entry.url,                                // File in Pod to Read
-            { fetch: fetch }       // fetch from authenticated session
-          ).then((raw) => {
-            let imageUrl = URL.createObjectURL(raw);
-            entry.imageUrl = imageUrl;
-            return imageUrl;
-            //Object.assign({}, urlObject, {imageBlob: imageUrl});
-            //urlObject.imageBlob = imageUrl;
-            //return(<Image variant="top" src={imageUrl} rounded/>);
-        });
-          
-    }
-
+    async function fetchSomeData(files) {
+        console.log("Fetching");
+        console.log(files);
+        let processedUrls = [];
     
-    let processedUrls= [];
-
-     files.forEach((entry, index) => {
-         let processedEntry = {
+        for (const entry of files) {
+          console.log(entry);
+          let processedEntry = {
             url: entry.url,
             shortName: getName(entry.url),
             isFolderBoolean: isFolder(entry.url),
             imageUrl: null,
-        };
-        getImage(processedEntry);
-        processedUrls.push(processedEntry);
-     }    
-    );  
+          };
+          processedUrls.push(processedEntry);
     
+          if (isImage(processedEntry.url)) {
+            let raw = await getFile(processedEntry.url, { fetch: fetch });
+            let imageUrl = URL.createObjectURL(raw);
+            processedEntry.imageUrl = imageUrl;
+          }
+        }
+        setFolderImages(processedUrls);
+      }
+
+      useEffect(() => {
+        fetchSomeData(props.files)
+      }, [props.files]);
     
-    console.log(processedUrls);
-
-
     function renderEntry(folderEntry){
         let result = null;
 
@@ -100,14 +95,14 @@ function GridView(props){
 
     return(
         <Row xs={3} className="g-4">
-            {processedUrls.map((folderEntry, index) => (
+            {folderImages.map((folderEntry, index) => (
                 <Card>
                         {renderEntry(folderEntry)}
                         
                             <Card.Body>
                                 <Card.Title>
                                     <p onClick={() => openLink(folderEntry.url)}>
-                                    {getName(folderEntry.url)}
+                                    {folderEntry.shortName}
                                     </p>
                                 </Card.Title> 
                             </Card.Body>
