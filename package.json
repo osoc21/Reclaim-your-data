@@ -2,6 +2,7 @@
   "name": "reclaim_your_data",
   "version": "0.1.0",
   "private": true,
+  "homepage": "https://osoc21.github.io/Reclaim-your-data",
   "dependencies": {
     "@inrupt/solid-client": "^1.10.0",
     "@inrupt/solid-client-authn-browser": "^1.9.1",
@@ -12,6 +13,7 @@
     "bootstrap": "^4.6.0",
     "buffer": "^6.0.3",
     "events": "^3.3.0",
+    "gh-pages": "^3.2.3",
     "react": "^17.0.2",
     "react-bootstrap": "^1.6.1",
     "react-dom": "^17.0.2",
@@ -21,6 +23,8 @@
     "webpack": "^4.44.2"
   },
   "scripts": {
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
