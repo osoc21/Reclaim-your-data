@@ -41,8 +41,9 @@ function App() {
                     {isLoggedIn() ? <Redirect to="/"/> : null} 
                 </Route>
                 <Route path="/home/upload">
-                    <button className="Button" onClick={() => history.goBack()}>Go back</button>
-                    <FileUpload explorerPath={explorerPath}/>
+                    {isLoggedIn() ? <div><button className="Button" onClick={() => history.goBack()}>Go back</button>
+                        <FileUpload explorerPath={explorerPath}/></div> : <Redirect to={"/"} />
+                    }
                 </Route>
                 <Route path="/home">
                     <button className="Button" onClick={() => history.goBack()}>Go back</button>

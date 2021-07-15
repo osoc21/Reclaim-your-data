@@ -1,7 +1,5 @@
 import React, {useState} from "react";
 
-import FileUpload from "./FileUpload"
-
 import "./FileExplorer.css"
 
 // Import from "@inrupt/solid-client-authn-browser"
@@ -10,7 +8,7 @@ import {fetch} from '@inrupt/solid-client-authn-browser';
 // Import from "@inrupt/solid-client"
 import {getSolidDataset, getThingAll} from '@inrupt/solid-client';
 
-import {getPODUrlFromWebId} from './pod'
+import {getPODUrlFromWebId} from './pod';
 
 
 function FileExplorer(props) {

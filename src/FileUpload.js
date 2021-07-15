@@ -13,7 +13,7 @@ import {
 
 
 function FileUpload(props) {
-    let currentPath = props.currentPath;
+    let currentPath = props.explorerPath;
     let [selectedFiles, setSelectedFiles] = useState([]);
 
 
@@ -21,6 +21,7 @@ function FileUpload(props) {
         for (let file of selectedFiles) {
             placeFileInContainer(file, currentPath);
         }
+        //TODO: add success/failure notification of uploading file(s)
     }
 
     /**
@@ -55,7 +56,7 @@ function FileUpload(props) {
 
         // selectedFiles is iterable but not an array, so map() and forEach() functions don't work
         for (let file of selectedFiles) {
-            res.push(file.name);
+            res.push(<li>{file.name}</li>);
         }
 
         return res;
