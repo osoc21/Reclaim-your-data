@@ -1,12 +1,17 @@
 
-.grid-view
-{
-    background: grey;
+.grid-view {
+    /*background: grey;*/
 }
 
 
-.custom-image-list{
+.custom-image-list {
     margin: 2rem;
+}
+
+.folder {
+    background-color: blue;
+    /* width: 40vmin; 40% screen width in portrait mode, 40% height in landscape mode */
+    /*height: 40vmin;*/
 }
 
 

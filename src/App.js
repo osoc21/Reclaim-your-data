@@ -52,33 +52,57 @@ function App() {
         return (webId !== "") && loggedIn;
     }
 
+    function getLoginComponent()
+    {
+        return (<Login setWebId={setWebId} setLoggedIn={setLoggedIn}/>);
+    }
+
+    function getHomeComponent()
+    {
+        return [
+            <MenuBar classes={classes} history={history}/>
+            ,
+            <Home classes={classes} webId={webId}
+            history={history}
+            explorerPath={explorerPath}
+            setExplorerPath={setExplorerPath}/>];
+    }
+
+
     return (
-    <div className="app-div">
-        <Switch>
-            <Route path="/login">
-                <Login setWebId={setWebId} setLoggedIn={setLoggedIn}/>
-                {/* We execute this separately and after the login, this allows
-                an automatic redirect to '/home' when we come back from login form. */}
-                {isLoggedIn() ? <Redirect to="/"/> : null} 
-            </Route>
-            <Route path="/home/upload">
-                {isLoggedIn() ? <div><MenuBar classes={classes} history={history}/>
-                    <FileUpload explorerPath={explorerPath}/></div> : <Redirect to={"/"} />
-                }
-            </Route>
-            <Route path="/home">
-                <MenuBar classes={classes} history={history}/>
-                {isLoggedIn() ? <Home classes={classes} webId={webId}
-                history={history}
-                explorerPath={explorerPath}
-                setExplorerPath={setExplorerPath}/> : <Redirect to="/"/>}
-            </Route>
-            <Route path="/">
-                {isLoggedIn() ? <Redirect push to="/home"/> : <Redirect push to="/login"/>}
-            </Route>
-        </Switch>
-    </div>
+        <div className="app-div">
+            {isLoggedIn() ? getHomeComponent() : getLoginComponent()}
+        </div>
     );
+
+    // return (
+    //     <div className="app-div">
+    //         <Switch>
+    //             <Route path="/login">
+    //                 <Login setWebId={setWebId} setLoggedIn={setLoggedIn}/>
+    //                 {/* We execute this separately and after the login, this allows
+    //                 an automatic redirect to '/home' when we come back from login form. */}
+    //                 {isLoggedIn() ? <Redirect to="/"/> : null} 
+    //             </Route>
+    //             <Route path="/home/upload">
+    //                 {isLoggedIn() ? [<MenuBar classes={classes} history={history}/>,
+    //                     <FileUpload explorerPath={explorerPath}/>] : <Redirect to={"/"} />
+    //                 }
+    //             </Route>
+    //             <Route path="/home">
+    //                 <MenuBar classes={classes} history={history}/>
+    //                 {isLoggedIn() ? <Home classes={classes} webId={webId}
+    //                 history={history}
+    //                 explorerPath={explorerPath}
+    //                 setExplorerPath={setExplorerPath}/> : <Redirect to="/"/>}
+    //             </Route>
+    //             <Route exact path="/">
+    //                 {isLoggedIn() ? <Redirect push to="/home"/> : <Redirect push to="/login"/>}
+    //             </Route>
+    //         </Switch>
+    //     </div>
+    // );
+
 }
 
 
@@ -106,6 +130,62 @@ function MenuBar(props)
 }
 
 function Home(props)
+{
+    let webId = props.webId;
+    let explorerPath = props.explorerPath;
+    let setExplorerPath = props.setExplorerPath;
+    let history = props.history;
+    let match = useRouteMatch();
+    const classes = props.classes;
+
+    const [anchorEl, setAnchorEl] = useState(null);
+
+    const handleClick = (event) => {
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handleClose = () => {
+        setAnchorEl(null);
+    };
+
+    function gotoFileUpload()
+    {
+        console.log("goto file upload screen ...");
+        history.push(`/upload`);
+    }
+
+    return (
+        <div>
+            <Switch>
+                <div className="content">
+                    <Route path="/upload">
+                        <FileUpload explorerPath={explorerPath}/>
+                    </Route>
+                    <Route path="/">
+                        <h1>Home</h1>
+                        {/*<h3>webID: {webId}</h3>*/}
+                        <FileExplorer webId={webId} explorerPath={explorerPath}
+                        setExplorerPath={setExplorerPath}/>
+                        <Fab className={classes.fab} color="primary" 
+                        aria-label="add" aria-controls="simple-menu"
+                        onClick={handleClick} aria-haspopup="true">
+                          <AddIcon/>
+                        </Fab>
+                        <Menu id="simple-menu" anchorEl={anchorEl}
+                          keepMounted open={Boolean(anchorEl)}
+                          onClose={handleClose}>
+                            <MenuItem onClick={gotoFileUpload}>Upload files</MenuItem>
+                            <MenuItem onClick={handleClose}>New folder</MenuItem>
+                        </Menu>
+                    </Route>
+                </div>
+            </Switch>
+        </div>
+    );
+}
+
+
+function _HomeOLD(props)
 {
     let webId = props.webId;
     let match = useRouteMatch();
@@ -151,7 +231,5 @@ function Home(props)
         </div>
     );
 }
-
-
 
 export default App;
