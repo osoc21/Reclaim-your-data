@@ -2,8 +2,9 @@ import './App.css';
 import Login from "./Login";
 import FileExplorer from "./FileExplorer";
 import FileUpload from "./FileUpload";
-import React, {useState} from "react";
-import {AppBar, Toolbar, Button, Typography} from '@material-ui/core';
+
+import React, {useState, useEffect} from "react";
+import {AppBar, Toolbar} from '@material-ui/core';
 
 import { makeStyles } from "@material-ui/core/styles";
 
@@ -16,11 +17,11 @@ import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import {
   // Import Router and not BrowserRouter, otherwise history.push()
   // will update the url displayed in the browser but will not re-render afterwards
-  Router,
+  // Router,
   Switch,
   Route,
-  Link,
-  Redirect,
+  // Link,
+  // Redirect,
   useHistory,
   useRouteMatch
 } from "react-router-dom";
@@ -43,9 +44,14 @@ const useStyles = makeStyles({
 function App() {
     let [loggedIn, setLoggedIn] = useState(false);
     let [webId, setWebId] = useState("");
+    let [podUrl, setPodUrl] = useState("");
     let [explorerPath, setExplorerPath] = useState("");
     let history = useHistory();
     const classes = useStyles();
+
+    useEffect(() => {
+        setExplorerPath(podUrl);
+    }, [podUrl])
 
     function isLoggedIn()
     {
@@ -54,18 +60,16 @@ function App() {
 
     function getLoginComponent()
     {
-        return (<Login setWebId={setWebId} setLoggedIn={setLoggedIn}/>);
+        return (<Login setWebId={setWebId} setLoggedIn={setLoggedIn} setPodUrl={setPodUrl}/>);
     }
 
     function getHomeComponent()
     {
-        return [
-            <MenuBar classes={classes} history={history}/>
-            ,
-            <Home classes={classes} webId={webId}
+        return <Home classes={classes} 
+            webId={webId} podUrl={podUrl}
             history={history}
             explorerPath={explorerPath}
-            setExplorerPath={setExplorerPath}/>];
+            setExplorerPath={setExplorerPath}/>;
     }
 
 
@@ -132,10 +136,11 @@ function MenuBar(props)
 function Home(props)
 {
     let webId = props.webId;
+    let podUrl = props.podUrl;
     let explorerPath = props.explorerPath;
     let setExplorerPath = props.setExplorerPath;
     let history = props.history;
-    let match = useRouteMatch();
+    // let match = useRouteMatch();
     const classes = props.classes;
 
     const [anchorEl, setAnchorEl] = useState(null);
@@ -154,17 +159,17 @@ function Home(props)
         history.push(`/upload`);
     }
 
-    return (
-        <div>
-            <Switch>
-                <div className="content">
-                    <Route path="/upload">
+    return [
+            <MenuBar key="1" classes={classes} history={history}/>,
+            <div key="2" className="content">
+                <Switch>
+                    <Route exact path="/upload">
                         <FileUpload explorerPath={explorerPath}/>
                     </Route>
                     <Route path="/">
                         <h1>Home</h1>
                         {/*<h3>webID: {webId}</h3>*/}
-                        <FileExplorer webId={webId} explorerPath={explorerPath}
+                        <FileExplorer podUrl={podUrl} explorerPath={explorerPath}
                         setExplorerPath={setExplorerPath}/>
                         <Fab className={classes.fab} color="primary" 
                         aria-label="add" aria-controls="simple-menu"
@@ -178,10 +183,9 @@ function Home(props)
                             <MenuItem onClick={handleClose}>New folder</MenuItem>
                         </Menu>
                     </Route>
-                </div>
-            </Switch>
-        </div>
-    );
+                </Switch>
+            </div>
+    ];
 }
 
 

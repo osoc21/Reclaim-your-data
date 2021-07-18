@@ -1,5 +1,7 @@
 
-import "./Login.css"
+import "./Login.css";
+import {getPODUrlFromWebId} from './pod';
+
 import React from "react";
 
 import {Button} from '@material-ui/core';
@@ -15,6 +17,7 @@ import {
 function Login(props) {
 	let setLoggedIn = props.setLoggedIn;
 	let setWebId = props.setWebId;
+	let setPodUrl = props.setPodUrl;
 
 	let session = null;
 
@@ -38,7 +41,9 @@ function Login(props) {
 	  if (session.info.isLoggedIn) {
 	    // Update the page with the status.
 	    setLoggedIn(true);
-	    setWebId(session.info.webId);
+	    await setWebId(session.info.webId);
+	    let newPodUrl = getPODUrlFromWebId(session.info.webId);
+	    await setPodUrl(newPodUrl);
 	  }
 	}
 

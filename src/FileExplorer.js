@@ -1,9 +1,8 @@
-import React, {useState} from "react";
-import GridView from "./GridView";
-
-
 
 import "./FileExplorer.css"
+
+import React, {useState, useEffect} from "react";
+import GridView from "./GridView";
 
 // Import from "@inrupt/solid-client-authn-browser"
 import {fetch} from '@inrupt/solid-client-authn-browser';
@@ -11,42 +10,22 @@ import {fetch} from '@inrupt/solid-client-authn-browser';
 // Import from "@inrupt/solid-client"
 import {getSolidDataset, getThingAll} from '@inrupt/solid-client';
 
-import {getPODUrlFromWebId} from './pod';
-
 import {Container, Box} from '@material-ui/core';
-import AddIcon from '@material-ui/icons/Add';
 
 
 function FileExplorer(props) {
-    let webId = props.webId;
-    const MY_POD_URL = getPODUrlFromWebId(webId);
+    const POD_URL = props.podUrl;
 
     let [files, setFiles] = useState([]);
-    let [loading, setLoading] = useState(false);
+    let [loadingAnim, setLoadingAnim] = useState(false);
 
     let currentPath = props.explorerPath;
     let setCurrentPath = props.setExplorerPath;
 
-    if (currentPath === "")
-    {
-        setCurrentPath(MY_POD_URL);
-    }
-
-    function openFolder(myUrl)
-    {
-        setLoading(true);
-        // its important to set the current path first !!
-        getFilesFromResourceURL(myUrl).then((fileArray) => {
-            setCurrentPath(myUrl);
-            setFiles(fileArray);
-            setLoading(false);
-        });
-    }
-
 
     function fileExplorerGoBack() 
     {
-        if (currentPath.length > MY_POD_URL.length && currentPath !== MY_POD_URL) 
+        if (currentPath.length > POD_URL.length && currentPath !== POD_URL) 
         {
             // find the second-last '/', then keep the substring until that '/'
             // this gives the new path url
@@ -96,20 +75,24 @@ function FileExplorer(props) {
     }
 
 
-    function openLink(url)
+    function openFolder(url)
     {
+        console.log("open folder ...");
+        setLoadingAnim(true);
         // its important to set the current path first !!
         getFilesFromResourceURL(url).then((fileArray) => {
             setCurrentPath(url);
             setFiles(fileArray);
+            setLoadingAnim(false);
         });
     }
+
 
 
     /** Iterates on the file urls and returns an array of react components
      * in the form of resourceLink elements  */
     function fileArrayToReact() {
-        if (loading)
+        if (loadingAnim)
         {
             return <div className="loader"></div> 
         }
@@ -130,7 +113,9 @@ function FileExplorer(props) {
         return <p><i>Nothing to display</i></p>;
     }
 
+
     async function getFilesFromResourceURL(url) {
+        console.log("url:", url);
         const fetchedFiles = await getSolidDataset(url, {fetch: fetch});
 
         let children = await getThingAll(fetchedFiles);
@@ -145,10 +130,11 @@ function FileExplorer(props) {
         return res;
     }
 
+
     /** Fetch all files from the given path given relative to the root */
     function getRootFiles() {
-        getFilesFromResourceURL(MY_POD_URL).then((fileArray) => {
-            setCurrentPath(MY_POD_URL);
+        getFilesFromResourceURL(POD_URL).then((fileArray) => {
+            setCurrentPath(POD_URL);
             setFiles(fileArray);
         });
     }
@@ -157,13 +143,20 @@ function FileExplorer(props) {
     // only read files if not already in the array (avoid infinite refreshes !!!)
     // but also if the current path is the root (it's possible that we're not in the
     // root but the current path contains no file e.g. empty folder)
-    if ((files.length === 0) && (currentPath === MY_POD_URL)) 
-    {
-        // Don't use animation here as FileExplorer might already
-        // be rendering and updating too many properties
-        // at that time might cause 'too many rerenders'
-        getRootFiles();
-    }
+    // if ((files.length === 0) && (currentPath === POD_URL)) 
+    // {
+    //     // Don't use animation here as FileExplorer might already
+    //     // be rendering and updating too many properties
+    //     // at that time might cause 'too many rerenders'
+    //     getRootFiles();
+    // }
+
+    useEffect(() => {
+        if (POD_URL !== "")
+        {
+            getRootFiles();
+        }
+    }, [POD_URL]);
 
 
     return (
@@ -174,7 +167,7 @@ function FileExplorer(props) {
                     <p>Files for current path ({currentPath}):</p>
                 </div>
             </Box>
-            <GridView files={files} openLink={openLink}/>
+            <GridView files={files} openFolder={openFolder}/>
         </Container>
     );
 }

@@ -2,8 +2,7 @@ import React, {useState} from "react"
 
 // Import from "@inrupt/solid-client"
 import {
-    saveFileInContainer,
-    getSourceUrl
+    saveFileInContainer
 } from '@inrupt/solid-client';
 
 // Import from "@inrupt/solid-client-authn-browser"
