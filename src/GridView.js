@@ -24,7 +24,6 @@ function GridView(props) {
     let currentPath = props.currentPath;
     const [metadataFileExists, setMetadataFileExists] = useState(false);
 
-
     function isFolder(url) {
         return url.endsWith("/");
     }
@@ -48,7 +47,7 @@ function GridView(props) {
             // console.log(entry);
 
             if (entry.url.endsWith("metadata.json")) {
-                setMetadataFileExists(true);
+                await setMetadataFileExists(true);
             }
 
             let processedEntry = {
@@ -62,12 +61,13 @@ function GridView(props) {
             processedEntries.push(processedEntry);
         }
         await getExifData(processedEntries);
-        setEntries(processedEntries);
+        await setEntries(processedEntries);
+        sortByDate(processedEntries);
     }
 
     async function getExifData(processedEntries) {
         for (const entry of processedEntries) {
-            if (isImage(entry)) {
+            if (isImage(entry.url)) {
                 let raw = await getFile(entry.url, {fetch: fetch});
                 entry.imageUrl = URL.createObjectURL(raw);
 
@@ -101,40 +101,45 @@ function GridView(props) {
         });
     }
 
-    function updateMedataFile(newContent) {
+    async function updateMedataFile() {
         //
     }
 
-    async function uploadFile(file, url) {
+    async function uploadMetadataFile(file, url) {
         console.log(url);
 
-        if (!metadataFileExists) {
-            const savedFile = await saveFileInContainer(
-                url,           // Container URL
-                file,                         // File
-                {
-                    slug: file.name, // file.name.split('.')[0]
-                    contentType: file.type, fetch: fetch
-                }
-            );
-        } else {
-            const savedFile = await overwriteFile(
-                url,
-                file,
-                {
-                    slug: file.name,
-                    contentType: file.type,
-                    fetch: fetch
-                });
-            console.log("overwritten");
+        // TODO: Add check for metadatFileExists here instead
+
+        if (url !== "") {
+            if (!metadataFileExists) {
+                const savedFile = await saveFileInContainer(
+                    url,
+                    file,
+                    {
+                        slug: file.name,
+                        contentType: file.type, fetch: fetch
+                    }
+                );
+            } else {
+                console.log("wanting to overwrite");
+                const savedFile = await overwriteFile(
+                    url,
+                    file,
+                    {
+                        slug: file.name,
+                        contentType: file.type,
+                        fetch: fetch
+                    });
+                console.log("overwritten");
+            }
         }
     }
 
     useEffect(() => {
-        getEntriesFromFiles(files);
+        getEntriesFromFiles(files).then(() =>
+            uploadMetadataFile(metadataFile(), currentPath));
         console.log(currentPath);
-        uploadFile(metadataFile(), currentPath);
-    }, [files, props.currentPath]);
+    }, [files, currentPath]);
 
     function renderEntry(folderEntry, idx) {
         if ((!folderEntry.isFolder) && folderEntry.imageUrl) {

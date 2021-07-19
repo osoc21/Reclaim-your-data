@@ -40,7 +40,7 @@ function Login(props) {
 
 	  if (session.info.isLoggedIn) {
 	    // Update the page with the status.
-	    setLoggedIn(true);
+	    await setLoggedIn(true);
 	    await setWebId(session.info.webId);
 	    let newPodUrl = getPODUrlFromWebId(session.info.webId);
 	    await setPodUrl(newPodUrl);
