@@ -7,6 +7,7 @@ import {
 
   // Import from "@inrupt/solid-client"
 import {
+    getDate,
     getFile,
   } from '@inrupt/solid-client';
 
@@ -43,6 +44,10 @@ function GridView(props){
         return match[match.length - 1];
     }
 
+    function sortByDate(files){
+        return files.sort((a, b) => b.date - a.date);
+    }
+
     async function fetchSomeData(files) {
         //console.log("Fetching");
         //console.log(files);
@@ -55,6 +60,7 @@ function GridView(props){
             shortName: getName(entry.url),
             isFolderBoolean: isFolder(entry.url),
             imageUrl: null,
+            date: null
           };
           processedUrls.push(processedEntry);
 
@@ -66,21 +72,27 @@ function GridView(props){
             let exifData = exif.readFromBinaryFile(arrayBuffer);
             if (exifData) {
                 let dateTime = exifData.DateTime ? exifData.DateTime.replace(":","/").replace(":","/") : undefined
-                let latitude = exifData.GPSLatitude && exifData.GPSLatitude[0] ? exifData.GPSLatitude : null
-                let longitude = exifData.GPSLongitude && exifData.GPSLongitude[0] ? exifData.GPSLongitude : null
+                //let latitude = exifData.GPSLatitude && exifData.GPSLatitude[0] ? exifData.GPSLatitude : null
+                //let longitude = exifData.GPSLongitude && exifData.GPSLongitude[0] ? exifData.GPSLongitude : null
                 console.log(`exifdata`);
                 console.log(dateTime);
+                processedEntry.date = new Date(dateTime);
+                /*
                 if (latitude != null && longitude != null) {
                     // note: the dms2dec lib expects 4 parameters, but we haven't found a way to parse if the picture
                     // was taken in the NESW direction, so at the moment it's hardcoded
                     console.log(dms2dec(latitude, "N", longitude, "E"));
                 }
+                */
             }
 
             processedEntry.imageUrl = imageUrl;
           }
         }
-        setFolderImages(processedUrls);
+        console.log(processedUrls);
+        let sortedImages = sortByDate(processedUrls);
+        console.log(sortedImages);
+        setFolderImages(sortedImages);
       }
 
       useEffect(() => {
