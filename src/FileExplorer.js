@@ -1,8 +1,7 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import GridView from "./GridView";
 
-
-import {Row, Col, Container} from 'react-bootstrap';
+import {Container, Row} from 'react-bootstrap';
 
 import "./FileExplorer.css"
 
@@ -10,7 +9,7 @@ import "./FileExplorer.css"
 import {fetch} from '@inrupt/solid-client-authn-browser';
 
 // Import from "@inrupt/solid-client"
-import {getSolidDataset, getThingAll} from '@inrupt/solid-client';
+import {getSolidDataset, getThingAll, saveFileInContainer} from '@inrupt/solid-client';
 
 import {getPODUrlFromWebId} from './pod';
 
@@ -25,13 +24,11 @@ function FileExplorer(props) {
     let currentPath = props.explorerPath;
     let setCurrentPath = props.setExplorerPath;
 
-    if (currentPath === "")
-    {
+    if (currentPath === "") {
         setCurrentPath(MY_POD_URL);
     }
 
-    function openFolder(myUrl)
-    {
+    function openFolder(myUrl) {
         setLoading(true);
         // its important to set the current path first !!
         getFilesFromResourceURL(myUrl).then((fileArray) => {
@@ -42,20 +39,16 @@ function FileExplorer(props) {
     }
 
 
-    function fileExplorerGoBack() 
-    {
-        if (currentPath.length > MY_POD_URL.length && currentPath !== MY_POD_URL) 
-        {
+    function fileExplorerGoBack() {
+        if (currentPath.length > MY_POD_URL.length && currentPath !== MY_POD_URL) {
             // find the second-last '/', then keep the substring until that '/'
             // this gives the new path url
             let lastSlashPos = currentPath.slice(0, -1).lastIndexOf('/');
             let newPath = currentPath.slice(0, lastSlashPos + 1)
 
             openFolder(newPath);
-           
-        } 
-        else 
-        {
+
+        } else {
             alert("Cannot go back from POD root.");
         }
     }
@@ -65,20 +58,16 @@ function FileExplorer(props) {
         let url = itemURL;
         let resourceName = stripURL(url);
 
-        function open() 
-        {
-            if (url.endsWith("/")) 
-            {
+        function open() {
+            if (url.endsWith("/")) {
                 console.log("opening " + url + " ...");
                 openFolder(url);
-            } 
-            else 
-            {
+            } else {
                 alert("this is a file, handle it");
             }
         }
 
-       return {"pathName": {url}, "open": {open}};
+        return {"pathName": {url}, "open": {open}};
     }
 
     /** Iteraetes on the file urls and returns an array of react components */
@@ -94,8 +83,7 @@ function FileExplorer(props) {
     }
 
 
-    function openLink(url)
-    {
+    function openLink(url) {
         // its important to set the current path first !!
         getFilesFromResourceURL(url).then((fileArray) => {
             setCurrentPath(url);
@@ -107,9 +95,8 @@ function FileExplorer(props) {
     /** Iterates on the file urls and returns an array of react components
      * in the form of resourceLink elements  */
     function fileArrayToReact() {
-        if (loading)
-        {
-            return <div className="loader"></div> 
+        if (loading) {
+            return <div className="loader"></div>
         }
 
         // the first child element is self
@@ -155,13 +142,16 @@ function FileExplorer(props) {
     // only read files if not already in the array (avoid infinite refreshes !!!)
     // but also if the current path is the root (it's possible that we're not in the
     // root but the current path contains no file e.g. empty folder)
-    if ((files.length === 0) && (currentPath === MY_POD_URL)) 
-    {
+    if ((files.length === 0) && (currentPath === MY_POD_URL)) {
         // Don't use animation here as FileExplorer might already
         // be rendering and updating too many properties
         // at that time might cause 'too many rerenders'
         getRootFiles();
     }
+
+    /*useEffect(() => {
+        setCurrentPath(MY_POD_URL);
+    }, [props.currentPath]);*/
 
 
     return (
@@ -172,7 +162,7 @@ function FileExplorer(props) {
                     <p>Files for current path ({currentPath}):</p>
                 </div>
             </Row>
-            <GridView files={files} openLink={openLink}/>
+            <GridView files={files} openLink={openLink} currentPath={currentPath}/>
         </Container>
     );
 }
