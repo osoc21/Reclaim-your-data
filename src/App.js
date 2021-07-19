@@ -166,7 +166,7 @@ function Home(props)
                     <Route exact path="/upload">
                         <FileUpload explorerPath={explorerPath}/>
                     </Route>
-                    <Route path="/">
+                    <Route exact path="/">
                         <h1>Home</h1>
                         {/*<h3>webID: {webId}</h3>*/}
                         <FileExplorer podUrl={podUrl} explorerPath={explorerPath}
@@ -197,11 +197,11 @@ function _HomeOLD(props)
 
     const [anchorEl, setAnchorEl] = useState(null);
 
-    const handleClick = (event) => {
+    const handleFabClick = (event) => {
         setAnchorEl(event.currentTarget);
     };
 
-    const handleClose = () => {
+    const handleFabClose = () => {
         setAnchorEl(null);
     };
 
@@ -209,6 +209,7 @@ function _HomeOLD(props)
     {
         console.log("goto file upload screen ...");
         props.history.replace(`${match.url}/upload`);
+        handleFabClose();
     }
 
     return (
@@ -219,7 +220,7 @@ function _HomeOLD(props)
             setExplorerPath={props.setExplorerPath}/>
             <Fab className={classes.fab} color="primary" 
             aria-label="add" aria-controls="simple-menu"
-            onClick={handleClick} aria-haspopup="true">
+            onClick={handleFabClick} aria-haspopup="true">
               <AddIcon/>
             </Fab>
             <Menu
@@ -227,10 +228,10 @@ function _HomeOLD(props)
               anchorEl={anchorEl}
               keepMounted
               open={Boolean(anchorEl)}
-              onClose={handleClose}
+              onClose={handleFabClose}
             >
                 <MenuItem onClick={gotoFileUpload}>Upload files</MenuItem>
-                <MenuItem onClick={handleClose}>New folder</MenuItem>
+                <MenuItem onClick={handleFabClose}>New folder</MenuItem>
             </Menu>
         </div>
     );

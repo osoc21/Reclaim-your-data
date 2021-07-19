@@ -11,7 +11,8 @@
   background: rgb(224,224,227);
   background: radial-gradient(circle, rgba(224,224,227,1) 1%,
   rgba(213,219,226,0.9803454829197304) 52%, rgba(215,215,220,1) 100%);
-  overflow:  scroll;
+  overflow-y: scroll;
+  overflow-x: hidden;
 }
 
 .app-div

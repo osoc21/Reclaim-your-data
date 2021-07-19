@@ -10,14 +10,16 @@ import {fetch} from '@inrupt/solid-client-authn-browser';
 // Import from "@inrupt/solid-client"
 import {getSolidDataset, getThingAll} from '@inrupt/solid-client';
 
-import {Container, Box} from '@material-ui/core';
+import {Container, Box, Fab} from '@material-ui/core';
+
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 
 function FileExplorer(props) {
     const POD_URL = props.podUrl;
 
     let [files, setFiles] = useState([]);
-    let [loadingAnim, setLoadingAnim] = useState(false);
+    let [loadingAnim, setLoadingAnim] = useState(true); // when first loading, show anim
 
     let currentPath = props.explorerPath;
     let setCurrentPath = props.setExplorerPath;
@@ -88,6 +90,15 @@ function FileExplorer(props) {
     }
 
 
+    function showLoadingAnimation()
+    {
+        if (loadingAnim)
+        {
+            return <CircularProgress size={100} style={{position: "fixed", right: "50vw", bottom: "50vh", color: '#1a90ff',
+                }}/>
+        }
+    }
+
 
     /** Iterates on the file urls and returns an array of react components
      * in the form of resourceLink elements  */
@@ -136,6 +147,7 @@ function FileExplorer(props) {
         getFilesFromResourceURL(POD_URL).then((fileArray) => {
             setCurrentPath(POD_URL);
             setFiles(fileArray);
+            setLoadingAnim(false);
         });
     }
 
@@ -164,6 +176,7 @@ function FileExplorer(props) {
             <Box>
                 <div id="file-explorer">
                     <button className="Button" id="go-back" onClick={fileExplorerGoBack}>Go back</button>
+                    {showLoadingAnimation()}
                     <p>Files for current path ({currentPath}):</p>
                 </div>
             </Box>
