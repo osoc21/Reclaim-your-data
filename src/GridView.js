@@ -28,6 +28,7 @@ import "./GridView.css";
 function GridView(props){
     let files = props.files;
     let openFolder = props.openFolder;
+    let setLoadingAnim = props.setLoadingAnim;
     const [entries, setEntries] = useState([]);
 
     useEffect(() => {
@@ -78,8 +79,8 @@ function GridView(props){
         setEntries(processedUrls);
     }
 
-
-    function renderEntry(folderEntry)
+    // TODO: move this to utils.js or other appropriate file
+    function renderEntry(folderEntry, idx)
     {
         if((! folderEntry.isFolder) && folderEntry.imageUrl)
         {
@@ -128,10 +129,22 @@ function GridView(props){
         return result;
     }
 
+
+    // async function renderAllFiles()
+    // {
+    //     let res = entries.map( (folderEntry, index) => renderEntry(folderEntry, index) );
+    //     await setLoadingAnim(false);
+    //     return res;
+    // }
+
+    // useEffect(() => {
+
+    // }, []);
+
     return(
         <div className="grid-view">
-            <ImageList style={{textAlign: "center"}} cols={2}>
-                {entries.map((folderEntry, index) => renderEntry(folderEntry))}
+            <ImageList rowHeight={160} cols={3}>
+                {entries.map( (folderEntry, index) => renderEntry(folderEntry, index) )}
             </ImageList>
         </div>  
     );

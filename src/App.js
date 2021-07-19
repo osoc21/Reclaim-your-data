@@ -16,6 +16,9 @@ import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import HomeIcon from '@material-ui/icons/Home';
 import ViewCarouselIcon from '@material-ui/icons/ViewCarousel';
 import PhotoIcon from '@material-ui/icons/Photo';
+import Alert from '@material-ui/lab/Alert';
+import Collapse from '@material-ui/core/Collapse';
+import CloseIcon from '@material-ui/icons/Close';
 
 
 import {
@@ -158,6 +161,9 @@ function BottomNavBar(props)
 
 function Home(props)
 {
+    let [notifMsg, setNotifMsg] = useState("");
+    let [notifType, setNotifType] = useState("");
+
     let webId = props.webId;
     let podUrl = props.podUrl;
     let explorerPath = props.explorerPath;
@@ -182,22 +188,42 @@ function Home(props)
         history.push(`/upload`);
     }
 
-    return [
-            <MenuBar key="1" classes={classes} history={history}/>,
-            <div key="2" className="content">
+    function Notification(props)
+    {
+        let notifMsg = props.notifMsg;
+        let notifType = props.notifType;
+
+        return (<Collapse in={notifMsg !== ""}>
+                    <Alert key="2" severity={notifType} action={
+                            <IconButton
+                              aria-label="close"
+                              color="inherit"
+                              size="small"
+                              onClick={() => {setNotifMsg("");}}>
+                              <CloseIcon fontSize="inherit" />
+                            </IconButton>}>
+                        {notifMsg}
+                    </Alert>
+                </Collapse>);
+    }
+
+    return [<MenuBar key="1" classes={classes} history={history}/>,
+            <Notification notifMsg={notifMsg} notifType={notifType}/>,
+            <div key="3" className="content">
                 <Switch>
                     <Route exact path="/upload">
-                        <FileUpload explorerPath={explorerPath}/>
+                        <FileUpload explorerPath={explorerPath} setNotifMsg={setNotifMsg}
+                        setNotifType={setNotifType}/>
                     </Route>
                     <Route exact path="/">
-                        <h1>Home</h1>
+                        {/*<h1>Home</h1>*/}
                         {/*<h3>webID: {webId}</h3>*/}
                         <FileExplorer podUrl={podUrl} explorerPath={explorerPath}
                         setExplorerPath={setExplorerPath}/>
                     </Route>
                 </Switch>
             </div>,
-            <BottomNavBar classes={classes} key="3"/>
+            <BottomNavBar classes={classes} key="4"/>
     ];
 }
 

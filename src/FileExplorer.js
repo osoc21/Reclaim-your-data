@@ -94,7 +94,7 @@ function FileExplorer(props) {
     {
         if (loadingAnim)
         {
-            return <CircularProgress size={100} style={{position: "fixed", right: "50vw", bottom: "50vh", color: '#1a90ff',
+            return <CircularProgress size={100} style={{zIndex: 1600, position: "fixed", right: "40vw", bottom: "50vh", color: '#1a90ff',
                 }}/>
         }
     }
@@ -172,15 +172,9 @@ function FileExplorer(props) {
 
 
     return (
-        <Container>
-            <Box>
-                <div id="file-explorer">
-                    <button className="Button" id="go-back" onClick={fileExplorerGoBack}>Go back</button>
-                    {showLoadingAnimation()}
-                    <p>Files for current path ({currentPath}):</p>
-                </div>
-            </Box>
-            <GridView files={files} openFolder={openFolder}/>
+        <Container id="file-explorer">
+            {showLoadingAnimation()}
+            <GridView files={files} openFolder={openFolder} setLoadingAnim={setLoadingAnim}/>
         </Container>
     );
 }

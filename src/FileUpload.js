@@ -14,12 +14,43 @@ import {
 function FileUpload(props) {
     let currentPath = props.explorerPath;
     let [selectedFiles, setSelectedFiles] = useState([]);
+    let setNotifMsg = props.setNotifMsg;
+    let setNotifType = props.setNotifType;
 
-
-    function upload() {
+    async function upload() {
+        let promiseArray = [];
+        console.log("uploading ...");
         for (let file of selectedFiles) {
-            placeFileInContainer(file, currentPath);
+            promiseArray.push(placeFileInContainer(file, currentPath));
         }
+        let promiseResults = await Promise.all(promiseArray);
+        let errorMsg = "";
+        for (let i = 0 ; i < promiseResults.length ; ++i)
+        {
+            let res = promiseResults[i];
+            // console.log(res)
+             
+            // promise is undefined if the upload wasn't sucessful
+            if (! res)
+            {
+                errorMsg += "Could not upload '" + selectedFiles[i].name + "', the file might already exist.\n";
+            }
+           
+        }
+
+        // there is an error or more
+        if (errorMsg !== "")
+        {
+            await setNotifType("error");
+            await setNotifMsg(errorMsg);
+        }
+        else
+        {
+            await setNotifType("success");
+            await setNotifMsg("Files successfully uploaded !!");
+        }
+
+
         //TODO: add success/failure notification of uploading file(s)
     }
 
@@ -39,9 +70,12 @@ function FileUpload(props) {
                     contentType: file.type, fetch: fetch
                 }
             );
+            return file.name;
+            // await setNotifType("error");
+            // await setNotifMsg("file '" + file.name + "' already exists.");
         } catch (error) {
-            console.error(error);
-            alert("file '" + file.name + "' already exists.");
+            console.error("ERROR CAUGHT:", error);
+            
         }
     }
 
