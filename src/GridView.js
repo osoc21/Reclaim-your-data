@@ -79,7 +79,18 @@ function GridView(props){
     }
 
 
-    function renderEntry(folderEntry){
+    function renderEntry(folderEntry)
+    {
+        if((! folderEntry.isFolder) && folderEntry.imageUrl)
+        {
+            return (<ImageListItem>
+                        <img src={folderEntry.imageUrl} alt={folderEntry.imageUrl}/>
+                    </ImageListItem>);
+        }
+        return null;
+    }
+
+    function _renderEntryOLD(folderEntry){
         let result = null;
         // console.log("imageUrl: " + folderEntry.imageUrl);
         
@@ -120,11 +131,7 @@ function GridView(props){
     return(
         <div className="grid-view">
             <ImageList style={{textAlign: "center"}} cols={2}>
-                {entries.map((folderEntry, index) => (
-                    <ImageListItem key={index}>
-                        {renderEntry(folderEntry)}
-                    </ImageListItem>
-                ))}
+                {entries.map((folderEntry, index) => renderEntry(folderEntry))}
             </ImageList>
         </div>  
     );

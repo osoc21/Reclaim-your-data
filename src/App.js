@@ -8,11 +8,15 @@ import {AppBar, Toolbar} from '@material-ui/core';
 
 import { makeStyles } from "@material-ui/core/styles";
 
-import {Menu, MenuItem, Fab} from '@material-ui/core';
+import {Menu, MenuItem, Fab, BottomNavigation, BottomNavigationAction} from '@material-ui/core';
 import AddIcon from '@material-ui/icons/Add';
 import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
+import HomeIcon from '@material-ui/icons/Home';
+import ViewCarouselIcon from '@material-ui/icons/ViewCarousel';
+import PhotoIcon from '@material-ui/icons/Photo';
+
 
 import {
   // Import Router and not BrowserRouter, otherwise history.push()
@@ -35,9 +39,12 @@ const useStyles = makeStyles({
     right: "10px",
     bottom: "10px",
   },
-  HamburgerMenu: {
+  topBarRightElem: {
     marginLeft: 'auto',
-  }
+  },
+  appBar: {
+    background: 'linear-gradient(to right, #0f0c29, #302b63, #24243e)',
+  },
 });
 
 
@@ -115,23 +122,39 @@ function MenuBar(props)
     let history = props.history;
     let classes = props.classes;
 
+    function gotoFileUpload()
+    {
+        console.log("goto file upload screen ...");
+        history.push(`/upload`);
+    }
+
     return(
-        <AppBar position="static">
+        <AppBar position="static" className={classes.appBar}>
             <Toolbar>
-                <ArrowBackIcon color="inherit" onClick={() => history.goBack()}/>
-                {/*<Button variant="contained" color="secondary" onClick={() => history.goBack()}>
-                    Go Back
-                </Button>*/}
-                <IconButton className={classes.HamburgerMenu} edge="start" color="inherit" aria-label="menu">
-                    <MenuIcon/>
+                <IconButton style={{color: "white"}} className={classes.topBarRightElem} edge="start"
+                aria-label="menu" onClick={gotoFileUpload}>
+                    <AddIcon/>
                 </IconButton>
-                {/*<Typography variant="h6">
-                    WePOD
-                </Typography>*/}
             </Toolbar>
         </AppBar>
     );
 }
+
+
+function BottomNavBar(props)
+{
+    let classes = props.classes;
+
+    return(
+        <BottomNavigation className={classes.appBar}
+        showLabels style={{position: 'fixed', bottom: 0, width: "300px", borderRadius: "10px", bottom: "10px"}}>
+            <BottomNavigationAction style={{color: "white"}} label="Photos" icon={<PhotoIcon/>} />
+            <BottomNavigationAction style={{color: "white"}} label="Albums" icon={<ViewCarouselIcon/>} />
+        </BottomNavigation>
+    );
+}
+
+
 
 function Home(props)
 {
@@ -171,20 +194,10 @@ function Home(props)
                         {/*<h3>webID: {webId}</h3>*/}
                         <FileExplorer podUrl={podUrl} explorerPath={explorerPath}
                         setExplorerPath={setExplorerPath}/>
-                        <Fab className={classes.fab} color="primary" 
-                        aria-label="add" aria-controls="simple-menu"
-                        onClick={handleClick} aria-haspopup="true">
-                          <AddIcon/>
-                        </Fab>
-                        <Menu id="simple-menu" anchorEl={anchorEl}
-                          keepMounted open={Boolean(anchorEl)}
-                          onClose={handleClose}>
-                            <MenuItem onClick={gotoFileUpload}>Upload files</MenuItem>
-                            <MenuItem onClick={handleClose}>New folder</MenuItem>
-                        </Menu>
                     </Route>
                 </Switch>
-            </div>
+            </div>,
+            <BottomNavBar classes={classes} key="3"/>
     ];
 }
 
