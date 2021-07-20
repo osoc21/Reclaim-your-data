@@ -131,7 +131,7 @@ function FileExplorer(props) {
 
 
     return (
-        <Container id="file-explorer">
+        <Container id="file-explorer" disableGutters="true">
             <GridView files={files} openFolder={openFolder} setLoadingAnim={setLoadingAnim} currentPath={currentPath}/>
         </Container>
     );
