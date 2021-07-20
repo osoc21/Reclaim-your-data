@@ -70,6 +70,7 @@ function GridView(props) {
         await getExifData(processedEntries);
         await setEntries(processedEntries);
         sortByDate(processedEntries);
+        uploadMetadataFile(processedEntries,currentPath);
     }
 
     async function getExifData(processedEntries) {
@@ -103,8 +104,9 @@ function GridView(props) {
         return files.sort((a, b) => b.date - a.date);
     }
 
-    function metadataFile() {
-        return new File(["Lorem Ipsum"], "metadata.json", {
+    function makeMetadataFile(jsObjects) {
+        const jsonString = `${JSON.stringify(jsObjects)}`;
+        return new File([jsonString], "metadata.json", {
             type: "application/json"
         });
     }
@@ -114,7 +116,7 @@ function GridView(props) {
     }
 
     
-    async function uploadMetadataFile(file, url) {
+    async function uploadMetadataFile(processedEntries, url) {
         console.log(url);
 
         // TODO: Add check for metadatFileExists here instead
@@ -122,7 +124,12 @@ function GridView(props) {
 
         //await checkForMetaDataFile();
 
-        if (url !== "") {
+        if (url !== "" && processedEntries.length > 0) {
+            console.log("in if branch");
+
+            console.log(JSON.stringify(processedEntries));
+
+            let file = makeMetadataFile(processedEntries);
          
           
             const savedFile = await overwriteFile(
@@ -140,8 +147,9 @@ function GridView(props) {
     }
 
     useEffect(() => {
-        getEntriesFromFiles(files).then(() =>
-            uploadMetadataFile(metadataFile(), currentPath));
+        getEntriesFromFiles(files)
+        /*.then(() =>
+            uploadMetadataFile(currentPath));*/
         console.log(currentPath);
        // checkForMetaDataFile();
     }, [files, currentPath]);
