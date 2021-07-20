@@ -1,14 +1,10 @@
-
-import "./FileExplorer.css"
-
-import React, {useState, useEffect} from "react";
+import React, {useEffect, useState} from "react";
 import GridView from "./GridView";
-
-// Import from "@inrupt/solid-client-authn-browser"
+import "./FileExplorer.css"
 import {fetch} from '@inrupt/solid-client-authn-browser';
 
 // Import from "@inrupt/solid-client"
-import {getSolidDataset, getThingAll} from '@inrupt/solid-client';
+import {getSolidDataset, getThingAll, saveFileInContainer} from '@inrupt/solid-client';
 
 import {Container, Box, Fab} from '@material-ui/core';
 
@@ -24,21 +20,25 @@ function FileExplorer(props) {
     let currentPath = props.explorerPath;
     let setCurrentPath = props.setExplorerPath;
 
+    /*function fileExplorerGoBack() {
+        if (currentPath.length > POD_URL.length && currentPath !== POD_URL) {
+            if (currentPath === "") {
+                setCurrentPath(MY_POD_URL);
+            }
+        }
+    }*/
 
-    function fileExplorerGoBack() 
-    {
-        if (currentPath.length > POD_URL.length && currentPath !== POD_URL) 
-        {
+
+    function fileExplorerGoBack() {
+        if (currentPath.length > POD_URL.length && currentPath !== POD_URL) {
             // find the second-last '/', then keep the substring until that '/'
             // this gives the new path url
             let lastSlashPos = currentPath.slice(0, -1).lastIndexOf('/');
             let newPath = currentPath.slice(0, lastSlashPos + 1)
 
             openFolder(newPath);
-           
-        } 
-        else 
-        {
+
+        } else {
             alert("Cannot go back from POD root.");
         }
     }
@@ -48,20 +48,16 @@ function FileExplorer(props) {
         let url = itemURL;
         let resourceName = stripURL(url);
 
-        function open() 
-        {
-            if (url.endsWith("/")) 
-            {
+        function open() {
+            if (url.endsWith("/")) {
                 console.log("opening " + url + " ...");
                 openFolder(url);
-            } 
-            else 
-            {
+            } else {
                 alert("this is a file, handle it");
             }
         }
 
-       return {"pathName": {url}, "open": {open}};
+        return {"pathName": {url}, "open": {open}};
     }
 
     /** Iteraetes on the file urls and returns an array of react components */
@@ -76,10 +72,7 @@ function FileExplorer(props) {
         return url.slice(slashPos + 1, searchUpperBound);
     }
 
-
-    function openFolder(url)
-    {
-        console.log("open folder ...");
+    function openFolder(url) {
         setLoadingAnim(true);
         // its important to set the current path first !!
         getFilesFromResourceURL(url).then((fileArray) => {
@@ -88,32 +81,6 @@ function FileExplorer(props) {
             setLoadingAnim(false);
         });
     }
-
-
-
-    // /** Iterates on the file urls and returns an array of react components
-    //  * in the form of resourceLink elements  */
-    // function fileArrayToReact() {
-    //     if (loadingAnim)
-    //     {
-    //         return <div className="loader"></div> 
-    //     }
-
-    //     // the first child element is self
-    //     if (files.length > 0) {
-    //         let reactElems = [];
-    //         let i = 0;
-
-    //         for (let item of files) {
-    //             reactElems.push(resourceLink(item.url, setCurrentPath, i));
-    //             i++;
-    //         }
-
-    //         return reactElems;
-    //     }
-
-    //     return <p><i>Nothing to display</i></p>;
-    // }
 
 
     async function getFilesFromResourceURL(url) {
@@ -148,7 +115,7 @@ function FileExplorer(props) {
     // only read files if not already in the array (avoid infinite refreshes !!!)
     // but also if the current path is the root (it's possible that we're not in the
     // root but the current path contains no file e.g. empty folder)
-    // if ((files.length === 0) && (currentPath === POD_URL)) 
+    // if ((files.length === 0) && (currentPath === POD_URL))
     // {
     //     // Don't use animation here as FileExplorer might already
     //     // be rendering and updating too many properties
@@ -157,8 +124,7 @@ function FileExplorer(props) {
     // }
 
     useEffect(() => {
-        if (POD_URL !== "")
-        {
+        if (POD_URL !== "") {
             getRootFiles();
         }
     }, [POD_URL]);
@@ -166,7 +132,7 @@ function FileExplorer(props) {
 
     return (
         <Container id="file-explorer">
-            <GridView files={files} openFolder={openFolder} setLoadingAnim={setLoadingAnim}/>
+            <GridView files={files} openFolder={openFolder} setLoadingAnim={setLoadingAnim} currentPath={currentPath}/>
         </Container>
     );
 }

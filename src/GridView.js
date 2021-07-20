@@ -1,87 +1,152 @@
 import React, {useEffect, useState} from "react";
 
 // Import from "@inrupt/solid-client-authn-browser"
-import {
-    fetch
-  } from '@inrupt/solid-client-authn-browser';
+import {fetch} from '@inrupt/solid-client-authn-browser';
 
-  // Import from "@inrupt/solid-client"
-import {
-    getFile,
-  } from '@inrupt/solid-client';
+// Import from "@inrupt/solid-client"
+import {getFile, overwriteFile, saveFileInContainer, deleteFile} from '@inrupt/solid-client';
 
 // import {Shape, Card, Row, Col, CardGroup, Image, Container} from 'react-bootstrap';
-
-import {
-ImageList,
-ImageListItem,
-ImageListItemBar} from '@material-ui/core';
+import {ImageList, ImageListItem} from '@material-ui/core';
 
 
 // import InfoIcon from '@material-ui/icons/Info';
-import FolderIcon from '@material-ui/icons/Folder';
-import InsertDriveFileIcon from '@material-ui/icons/InsertDriveFile';
-
+import dms2dec from "dms2dec";
 import "./GridView.css";
+import exif from 'exif-js';
 
 
-function GridView(props){
+function GridView(props) {
     let files = props.files;
     let openFolder = props.openFolder;
     let setLoadingAnim = props.setLoadingAnim;
     const [entries, setEntries] = useState([]);
+    let currentPath = props.currentPath;
+    //const [metadataFileExists, setMetadataFileExists] = useState(false);
 
     useEffect(() => {
         // here we use props prefix, otherwise setLoadingAnim is not recognized
         getEntriesFromFiles(files);
     }, [files]);
 
-
-    function isFolder(url){
+    function isFolder(url) {
         return url.endsWith("/");
     }
 
-    function isImage(url){
-       return url.endsWith(".jpg") || url.endsWith(".jpeg") || url.endsWith(".png");
+    function isImage(url) {
+        return url.endsWith(".jpg") || url.endsWith(".jpeg") || url.endsWith(".png");
     }
 
-    function getName(url){
+    function getName(url) {
         let regex = /^https:\/\/pod\.inrupt\.com(\/\w+)*\/(\w+)/;
         const match = url.match(regex);
-        // console.log(match);
         return match[match.length - 1];
     }
 
-    async function getEntriesFromFiles(files) 
-    {
+    async function getEntriesFromFiles(files) {
         // console.log("Fetching");
         // console.log(files);
-        let processedUrls = [];
+        let processedEntries = [];
 
-        for (const entry of files) 
-        {
+        for (const entry of files) {
             // console.log(entry);
+
+            /*
+            if (entry.url.endsWith("metadata.json")) {
+                await setMetadataFileExists(true);
+            }
+            */
+
             let processedEntry = {
                 url: entry.url,
                 shortName: getName(entry.url),
                 isFolder: isFolder(entry.url),
                 imageUrl: null,
+                date: null
             };
 
-            processedUrls.push(processedEntry);
-
-            if (isImage(processedEntry.url)) 
-            {
-                let raw = await getFile(processedEntry.url, { fetch: fetch });
-                let imageUrl = URL.createObjectURL(raw);
-                processedEntry.imageUrl = imageUrl;
-            }
+            processedEntries.push(processedEntry);
         }
-
-        await setEntries(processedUrls);
+        await getExifData(processedEntries);
+        await setEntries(processedEntries);
+        sortByDate(processedEntries);
     }
 
-    // TODO: move this to utils.js or other appropriate file
+    async function getExifData(processedEntries) {
+        for (const entry of processedEntries) {
+            if (isImage(entry.url)) {
+                let raw = await getFile(entry.url, {fetch: fetch});
+                entry.imageUrl = URL.createObjectURL(raw);
+
+                let arrayBuffer = await new Response(raw).arrayBuffer();
+                let exifData = exif.readFromBinaryFile(arrayBuffer);
+                if (exifData) {
+                    let dateTime = exifData.DateTime ? exifData.DateTime.replace(":", "/").replace(":", "/") : undefined
+                    //let latitude = exifData.GPSLatitude && exifData.GPSLatitude[0] ? exifData.GPSLatitude : null
+                    //let longitude = exifData.GPSLongitude && exifData.GPSLongitude[0] ? exifData.GPSLongitude : null
+                    console.log(`exifdata`);
+                    console.log(dateTime);
+                    entry.date = new Date(dateTime);
+                    if (exifData.latitude != null && exifData.longitude != null) {
+                        // note: the dms2dec lib expects 4 parameters, but we haven't found a way to parse if the picture
+                        // was taken in the NESW direction, so at the moment it's hardcoded
+                        // TODO: extract NESW direction from EXIF data
+                        console.log(dms2dec(exifData.latitude, "N", exifData.longitude, "E"));
+                    }
+                }
+            }
+        }
+    }
+
+
+    function sortByDate(files) {
+        return files.sort((a, b) => b.date - a.date);
+    }
+
+    function metadataFile() {
+        return new File(["Lorem Ipsum"], "metadata.json", {
+            type: "application/json"
+        });
+    }
+
+    async function updateMedataFile() {
+        //
+    }
+
+    
+    async function uploadMetadataFile(file, url) {
+        console.log(url);
+
+        // TODO: Add check for metadatFileExists here instead
+        let metadataFileExists = false;
+
+        //await checkForMetaDataFile();
+
+        if (url !== "") {
+         
+          
+            const savedFile = await overwriteFile(
+                url + file.name,
+                file,
+                {
+                    slug: file.name,
+                    contentType: file.type,
+                    fetch: fetch
+                });
+               
+                console.log("overwritten");
+            
+        }
+    }
+
+    useEffect(() => {
+        getEntriesFromFiles(files).then(() =>
+            uploadMetadataFile(metadataFile(), currentPath));
+        console.log(currentPath);
+       // checkForMetaDataFile();
+    }, [files, currentPath]);
+
+
     function renderEntry(folderEntry, idx)
     {
         if((! folderEntry.isFolder) && folderEntry.imageUrl)
@@ -93,49 +158,13 @@ function GridView(props){
         return null;
     }
 
-    function _renderEntryOLD(folderEntry){
-        let result = null;
-        // console.log("imageUrl: " + folderEntry.imageUrl);
-        
-        // folders
-        if(folderEntry.isFolder)
-        {
-            // use ...background: 'grey'.. for debugging
-            result = [<FolderIcon key="1" style={{margin: "-20px", color: '#ffdd99', fontSize: 160 }}
-            onClick={() => openFolder(folderEntry.url)}/>, 
-            <p key="2">{folderEntry.shortName}</p>];
-        }
-        // only image files
-        else if(folderEntry.imageUrl)
-        {
-            result = [<img key="1" src={folderEntry.imageUrl} alt={folderEntry.imageUrl}/>,
-                      <ImageListItemBar key="2" title={folderEntry.shortName}
-                            // subtitle={<span>url: {folderEntry.url}</span>}
-                            // actionIcon={
-                            // <IconButton aria-label={`info about ${folderEntry.shortName}`}>
-                            //     <InfoIcon/>
-                            // </IconButton>
-                            // }
-                       />];
-            
-        }
-        // any other file aside of folders and images
-        else
-        {
-            result = [<InsertDriveFileIcon key="1" color="action" style={{ margin: "-10px" , fontSize: 140 }}
-            onClick={() => alert("Can't open this file type.")}/>,
-            <p key="2">{folderEntry.shortName}</p>];
-        }
 
-        return result;
-    }
-
-    return(
+    return (
         <div className="grid-view">
-            <ImageList rowHeight={122} cols={4}>
-                {entries.map( (folderEntry, index) => renderEntry(folderEntry, index) )}
+            <ImageList rowHeight={160} cols={4}>
+                {entries.map((folderEntry, index) => renderEntry(folderEntry, index))}
             </ImageList>
-        </div>  
+        </div>
     );
 }
 
