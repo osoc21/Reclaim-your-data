@@ -117,20 +117,12 @@ function GridView(props) {
 
     
     async function uploadMetadataFile(processedEntries, url) {
-        console.log(url);
-
-        // TODO: Add check for metadatFileExists here instead
         let metadataFileExists = false;
 
-        //await checkForMetaDataFile();
-
         if (url !== "" && processedEntries.length > 0) {
-            console.log("in if branch");
-
-            console.log(JSON.stringify(processedEntries));
+            //console.log(JSON.stringify(processedEntries));
 
             let file = makeMetadataFile(processedEntries);
-         
           
             const savedFile = await overwriteFile(
                 url + file.name,
