@@ -42,7 +42,6 @@ import {
 } from "react-router-dom";
 
 
-
 // Style I want for fab, can add more - it's just a JS object
 const useStyles = makeStyles({
   fab: {
@@ -54,8 +53,14 @@ const useStyles = makeStyles({
     marginLeft: 'auto',
   },
   appBar: {
-    background: 'linear-gradient(to right, #0f0c29, #302b63, #24243e)',
+    background: 'black',
   },
+  bottomNavBtn: {
+    color: "grey",
+    "&$selected": {
+      color: "red"
+    }
+  }
 });
 
 
@@ -151,18 +156,20 @@ function MenuBar(props)
 function BottomNavBar(props)
 {
     let classes = props.classes;
+    let btnClass = classes.bottomNavBtn;
     let gotoScreen = props.gotoScreen;
     let [location, setLocation] = useState("/");
 
-    const handleChange = (event, newValue) => {gotoScreen(newValue)};
+    const handleChange = (event, newValue) => {setLocation(newValue); gotoScreen(newValue)};
+
 
     return(
         <BottomNavigation className={classes.appBar} value={location} onChange={handleChange}
         showLabels style={{position: 'fixed', width: "300px", borderRadius: "10px", bottom: "10px"}}>
-            <BottomNavigationAction style={{color: "white"}} value="/" label="Photos" icon={<PhotoIcon/>} />
-            <BottomNavigationAction style={{color: "white"}} value="/" label="Albums" icon={<FolderIcon/>} />
-            <BottomNavigationAction style={{color: "white"}} value="/profile" label="Profile" icon={<AccountBoxIcon/>} />
-            <BottomNavigationAction style={{color: "white"}} value="/contacts" label="Contacts" icon={<GroupIcon/>} />
+            <BottomNavigationAction className={btnClass} value="/" label="Photos" icon={<PhotoIcon/>} />
+            {/*<BottomNavigationAction style={{color: "white"}} value="/" label="Albums" icon={<FolderIcon/>} />*/}
+            <BottomNavigationAction className={btnClass} value="/profile" label="Profile" icon={<AccountBoxIcon/>} />
+            <BottomNavigationAction className={btnClass} value="/contacts" label="Contacts" icon={<GroupIcon/>} />
         </BottomNavigation>
     );
 }

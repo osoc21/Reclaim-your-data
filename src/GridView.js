@@ -87,7 +87,7 @@ function GridView(props){
         if((! folderEntry.isFolder) && folderEntry.imageUrl)
         {
             return (<ImageListItem>
-                        <img src={folderEntry.imageUrl} alt={folderEntry.imageUrl}/>
+                        <img loading="lazy" src={folderEntry.imageUrl} alt={folderEntry.imageUrl}/>
                     </ImageListItem>);
         }
         return null;
@@ -132,7 +132,7 @@ function GridView(props){
 
     return(
         <div className="grid-view">
-            <ImageList rowHeight={160} cols={3}>
+            <ImageList rowHeight={122} cols={4}>
                 {entries.map( (folderEntry, index) => renderEntry(folderEntry, index) )}
             </ImageList>
         </div>  
