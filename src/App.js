@@ -4,6 +4,7 @@ import FileExplorer from "./FileExplorer";
 import FileUpload from "./FileUpload";
 import Profile from "./Profile";
 import Contacts from "./Contacts";
+import Albums from "./Albums";
 
 
 import React, {useState, useEffect} from "react";
@@ -167,7 +168,7 @@ function BottomNavBar(props)
         <BottomNavigation className={classes.appBar} value={location} onChange={handleChange}
         showLabels style={{position: 'fixed', width: "300px", borderRadius: "10px", bottom: "10px"}}>
             <BottomNavigationAction className={btnClass} value="/" label="Photos" icon={<PhotoIcon/>} />
-            {/*<BottomNavigationAction style={{color: "white"}} value="/" label="Albums" icon={<FolderIcon/>} />*/}
+            <BottomNavigationAction className={btnClass} value="/albums" label="Albums" icon={<FolderIcon/>} />
             <BottomNavigationAction className={btnClass} value="/profile" label="Profile" icon={<AccountBoxIcon/>} />
             <BottomNavigationAction className={btnClass} value="/contacts" label="Contacts" icon={<GroupIcon/>} />
         </BottomNavigation>
@@ -212,7 +213,7 @@ function Home(props)
         if (loadingAnim)
         {
             return <CircularProgress size={100} 
-            style={{zIndex: 1600, position: "fixed", right: "40vw", bottom: "50vh", color: '#1a90ff'}}/>
+            style={{zIndex: 1600, position: "fixed", color: '#1a90ff'}}/>
         }
     }
 
@@ -251,6 +252,9 @@ function Home(props)
                     </Route>
                     <Route exact path="/contacts">
                         <Contacts/>
+                    </Route>
+                    <Route exact path="/albums">
+                        <Albums/>
                     </Route>
                     <Route exact path="/">
                         {/*<h1>Home</h1>*/}
