@@ -2,7 +2,7 @@
   "name": "reclaim_your_data",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://osoc21.github.io/Reclaim-your-data",
+  "homepage": "https://wepod.osoc.be/",
   "dependencies": {
     "@inrupt/solid-client": "^1.10.0",
     "@inrupt/solid-client-authn-browser": "^1.9.1",
