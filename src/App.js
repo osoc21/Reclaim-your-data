@@ -8,7 +8,7 @@ import Albums from "./Albums";
 
 
 import React, {useState, useEffect} from "react";
-import {AppBar, Toolbar} from '@material-ui/core';
+import {AppBar, Toolbar, Typography} from '@material-ui/core';
 
 import { makeStyles } from "@material-ui/core/styles";
 
@@ -144,6 +144,9 @@ function MenuBar(props)
     return(
         <AppBar position="sticky" className={classes.appBar}>
             <Toolbar>
+                <Typography variant="h6" color="inherit">
+                    WePod
+                </Typography>
                 <IconButton style={{color: "white"}} className={classes.topBarRightElem} edge="start"
                 aria-label="menu" onClick={() => {props.gotoScreen('/upload')}}>
                     <AddIcon/>
