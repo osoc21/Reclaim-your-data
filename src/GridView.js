@@ -32,8 +32,10 @@ function GridView(props){
     const [entries, setEntries] = useState([]);
 
     useEffect(() => {
-        getEntriesFromFiles(files)
+        // here we use props prefix, otherwise setLoadingAnim is not recognized
+        getEntriesFromFiles(files);
     }, [files]);
+
 
     function isFolder(url){
         return url.endsWith("/");
@@ -76,7 +78,7 @@ function GridView(props){
             }
         }
 
-        setEntries(processedUrls);
+        await setEntries(processedUrls);
     }
 
     // TODO: move this to utils.js or other appropriate file
@@ -102,7 +104,6 @@ function GridView(props){
             result = [<FolderIcon key="1" style={{margin: "-20px", color: '#ffdd99', fontSize: 160 }}
             onClick={() => openFolder(folderEntry.url)}/>, 
             <p key="2">{folderEntry.shortName}</p>];
-            // <div className="folder" ></div>;
         }
         // only image files
         else if(folderEntry.imageUrl)
@@ -128,18 +129,6 @@ function GridView(props){
 
         return result;
     }
-
-
-    // async function renderAllFiles()
-    // {
-    //     let res = entries.map( (folderEntry, index) => renderEntry(folderEntry, index) );
-    //     await setLoadingAnim(false);
-    //     return res;
-    // }
-
-    // useEffect(() => {
-
-    // }, []);
 
     return(
         <div className="grid-view">

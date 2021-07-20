@@ -2,6 +2,9 @@ import './App.css';
 import Login from "./Login";
 import FileExplorer from "./FileExplorer";
 import FileUpload from "./FileUpload";
+import Profile from "./Profile";
+import Contacts from "./Contacts";
+
 
 import React, {useState, useEffect} from "react";
 import {AppBar, Toolbar} from '@material-ui/core';
@@ -19,6 +22,11 @@ import PhotoIcon from '@material-ui/icons/Photo';
 import Alert from '@material-ui/lab/Alert';
 import Collapse from '@material-ui/core/Collapse';
 import CloseIcon from '@material-ui/icons/Close';
+import PersonIcon from '@material-ui/icons/Person';
+import GroupIcon from '@material-ui/icons/Group';
+import AccountBoxIcon from '@material-ui/icons/AccountBox';
+import FolderIcon from '@material-ui/icons/Folder';
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 
 import {
@@ -56,6 +64,7 @@ function App() {
     let [webId, setWebId] = useState("");
     let [podUrl, setPodUrl] = useState("");
     let [explorerPath, setExplorerPath] = useState("");
+
     let history = useHistory();
     const classes = useStyles();
 
@@ -124,18 +133,13 @@ function MenuBar(props)
 {
     let history = props.history;
     let classes = props.classes;
-
-    function gotoFileUpload()
-    {
-        console.log("goto file upload screen ...");
-        history.push(`/upload`);
-    }
+    let gotoScreen = props.gotoScreen;
 
     return(
         <AppBar position="static" className={classes.appBar}>
             <Toolbar>
                 <IconButton style={{color: "white"}} className={classes.topBarRightElem} edge="start"
-                aria-label="menu" onClick={gotoFileUpload}>
+                aria-label="menu" onClick={() => {props.gotoScreen('/upload')}}>
                     <AddIcon/>
                 </IconButton>
             </Toolbar>
@@ -147,12 +151,18 @@ function MenuBar(props)
 function BottomNavBar(props)
 {
     let classes = props.classes;
+    let gotoScreen = props.gotoScreen;
+    let [location, setLocation] = useState("/");
+
+    const handleChange = (event, newValue) => {gotoScreen(newValue)};
 
     return(
-        <BottomNavigation className={classes.appBar}
-        showLabels style={{position: 'fixed', bottom: 0, width: "300px", borderRadius: "10px", bottom: "10px"}}>
-            <BottomNavigationAction style={{color: "white"}} label="Photos" icon={<PhotoIcon/>} />
-            <BottomNavigationAction style={{color: "white"}} label="Albums" icon={<ViewCarouselIcon/>} />
+        <BottomNavigation className={classes.appBar} value={location} onChange={handleChange}
+        showLabels style={{position: 'fixed', width: "300px", borderRadius: "10px", bottom: "10px"}}>
+            <BottomNavigationAction style={{color: "white"}} value="/" label="Photos" icon={<PhotoIcon/>} />
+            <BottomNavigationAction style={{color: "white"}} value="/" label="Albums" icon={<FolderIcon/>} />
+            <BottomNavigationAction style={{color: "white"}} value="/profile" label="Profile" icon={<AccountBoxIcon/>} />
+            <BottomNavigationAction style={{color: "white"}} value="/contacts" label="Contacts" icon={<GroupIcon/>} />
         </BottomNavigation>
     );
 }
@@ -163,12 +173,14 @@ function Home(props)
 {
     let [notifMsg, setNotifMsg] = useState("");
     let [notifType, setNotifType] = useState("");
+    let [loadingAnim, setLoadingAnim] = useState(false); // when first loading, show anim
 
     let webId = props.webId;
     let podUrl = props.podUrl;
     let explorerPath = props.explorerPath;
     let setExplorerPath = props.setExplorerPath;
     let history = props.history;
+    
     // let match = useRouteMatch();
     const classes = props.classes;
 
@@ -182,19 +194,29 @@ function Home(props)
         setAnchorEl(null);
     };
 
-    function gotoFileUpload()
+    function gotoScreen(screenPath)
     {
-        console.log("goto file upload screen ...");
-        history.push(`/upload`);
+        console.log(`goto ${screenPath} ...`);
+        history.push(`${screenPath}`);
     }
+
+    function showLoadingAnimation()
+    {
+        if (loadingAnim)
+        {
+            return <CircularProgress size={100} 
+            style={{zIndex: 1600, position: "fixed", right: "40vw", bottom: "50vh", color: '#1a90ff'}}/>
+        }
+    }
+
 
     function Notification(props)
     {
         let notifMsg = props.notifMsg;
         let notifType = props.notifType;
 
-        return (<Collapse in={notifMsg !== ""}>
-                    <Alert key="2" severity={notifType} action={
+        return (<Collapse style={{overflowY: "scroll"}} in={(notifMsg !== "" && notifType !== "")}>
+                    <Alert severity={notifType} action={
                             <IconButton
                               aria-label="close"
                               color="inherit"
@@ -207,73 +229,33 @@ function Home(props)
                 </Collapse>);
     }
 
-    return [<MenuBar key="1" classes={classes} history={history}/>,
-            <Notification notifMsg={notifMsg} notifType={notifType}/>,
-            <div key="3" className="content">
+    return (<>
+            <MenuBar classes={classes} history={history} gotoScreen={gotoScreen}/>
+            {showLoadingAnimation()}
+            <Notification notifMsg={notifMsg} notifType={notifType}/>
+            <div className="content">
                 <Switch>
                     <Route exact path="/upload">
                         <FileUpload explorerPath={explorerPath} setNotifMsg={setNotifMsg}
-                        setNotifType={setNotifType}/>
+                        setNotifType={setNotifType} setLoadingAnim={setLoadingAnim}/>
+                    </Route>
+                    <Route exact path="/profile">
+                        <Profile/>
+                    </Route>
+                    <Route exact path="/contacts">
+                        <Contacts/>
                     </Route>
                     <Route exact path="/">
                         {/*<h1>Home</h1>*/}
                         {/*<h3>webID: {webId}</h3>*/}
                         <FileExplorer podUrl={podUrl} explorerPath={explorerPath}
-                        setExplorerPath={setExplorerPath}/>
+                        setExplorerPath={setExplorerPath} setLoadingAnim={setLoadingAnim}/>
                     </Route>
                 </Switch>
-            </div>,
-            <BottomNavBar classes={classes} key="4"/>
-    ];
+            </div>
+            <BottomNavBar classes={classes} gotoScreen={gotoScreen}/>
+        </>);
 }
 
-
-function _HomeOLD(props)
-{
-    let webId = props.webId;
-    let match = useRouteMatch();
-    const classes = props.classes;
-
-    const [anchorEl, setAnchorEl] = useState(null);
-
-    const handleFabClick = (event) => {
-        setAnchorEl(event.currentTarget);
-    };
-
-    const handleFabClose = () => {
-        setAnchorEl(null);
-    };
-
-    function gotoFileUpload()
-    {
-        console.log("goto file upload screen ...");
-        props.history.replace(`${match.url}/upload`);
-        handleFabClose();
-    }
-
-    return (
-        <div>
-            <h1>Home</h1>
-            {/*<h3>webID: {webId}</h3>*/}
-            <FileExplorer webId={webId} explorerPath={props.explorerPath}
-            setExplorerPath={props.setExplorerPath}/>
-            <Fab className={classes.fab} color="primary" 
-            aria-label="add" aria-controls="simple-menu"
-            onClick={handleFabClick} aria-haspopup="true">
-              <AddIcon/>
-            </Fab>
-            <Menu
-              id="simple-menu"
-              anchorEl={anchorEl}
-              keepMounted
-              open={Boolean(anchorEl)}
-              onClose={handleFabClose}
-            >
-                <MenuItem onClick={gotoFileUpload}>Upload files</MenuItem>
-                <MenuItem onClick={handleFabClose}>New folder</MenuItem>
-            </Menu>
-        </div>
-    );
-}
 
 export default App;

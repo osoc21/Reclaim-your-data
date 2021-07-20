@@ -12,15 +12,15 @@ import {getSolidDataset, getThingAll} from '@inrupt/solid-client';
 
 import {Container, Box, Fab} from '@material-ui/core';
 
-import CircularProgress from '@material-ui/core/CircularProgress';
+// import CircularProgress from '@material-ui/core/CircularProgress';
 
 
 function FileExplorer(props) {
     const POD_URL = props.podUrl;
 
     let [files, setFiles] = useState([]);
-    let [loadingAnim, setLoadingAnim] = useState(true); // when first loading, show anim
-
+    
+    let setLoadingAnim = props.setLoadingAnim;
     let currentPath = props.explorerPath;
     let setCurrentPath = props.setExplorerPath;
 
@@ -90,39 +90,30 @@ function FileExplorer(props) {
     }
 
 
-    function showLoadingAnimation()
-    {
-        if (loadingAnim)
-        {
-            return <CircularProgress size={100} style={{zIndex: 1600, position: "fixed", right: "40vw", bottom: "50vh", color: '#1a90ff',
-                }}/>
-        }
-    }
 
+    // /** Iterates on the file urls and returns an array of react components
+    //  * in the form of resourceLink elements  */
+    // function fileArrayToReact() {
+    //     if (loadingAnim)
+    //     {
+    //         return <div className="loader"></div> 
+    //     }
 
-    /** Iterates on the file urls and returns an array of react components
-     * in the form of resourceLink elements  */
-    function fileArrayToReact() {
-        if (loadingAnim)
-        {
-            return <div className="loader"></div> 
-        }
+    //     // the first child element is self
+    //     if (files.length > 0) {
+    //         let reactElems = [];
+    //         let i = 0;
 
-        // the first child element is self
-        if (files.length > 0) {
-            let reactElems = [];
-            let i = 0;
+    //         for (let item of files) {
+    //             reactElems.push(resourceLink(item.url, setCurrentPath, i));
+    //             i++;
+    //         }
 
-            for (let item of files) {
-                reactElems.push(resourceLink(item.url, setCurrentPath, i));
-                i++;
-            }
+    //         return reactElems;
+    //     }
 
-            return reactElems;
-        }
-
-        return <p><i>Nothing to display</i></p>;
-    }
+    //     return <p><i>Nothing to display</i></p>;
+    // }
 
 
     async function getFilesFromResourceURL(url) {
@@ -143,12 +134,14 @@ function FileExplorer(props) {
 
 
     /** Fetch all files from the given path given relative to the root */
-    function getRootFiles() {
+    async function getRootFiles() {
+        await setLoadingAnim(true);
         getFilesFromResourceURL(POD_URL).then((fileArray) => {
             setCurrentPath(POD_URL);
             setFiles(fileArray);
             setLoadingAnim(false);
         });
+        
     }
 
 
@@ -173,7 +166,6 @@ function FileExplorer(props) {
 
     return (
         <Container id="file-explorer">
-            {showLoadingAnimation()}
             <GridView files={files} openFolder={openFolder} setLoadingAnim={setLoadingAnim}/>
         </Container>
     );

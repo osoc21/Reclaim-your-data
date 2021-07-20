@@ -16,9 +16,11 @@ function FileUpload(props) {
     let [selectedFiles, setSelectedFiles] = useState([]);
     let setNotifMsg = props.setNotifMsg;
     let setNotifType = props.setNotifType;
+    let setLoadingAnim = props.setLoadingAnim;
 
     async function upload() {
         let promiseArray = [];
+        await setLoadingAnim(true);
         console.log("uploading ...");
         for (let file of selectedFiles) {
             promiseArray.push(placeFileInContainer(file, currentPath));
@@ -37,7 +39,7 @@ function FileUpload(props) {
             }
            
         }
-
+        await setLoadingAnim(false);
         // there is an error or more
         if (errorMsg !== "")
         {
@@ -115,6 +117,7 @@ function FileUpload(props) {
             <input id="file-input" type="file" multiple="multiple"
                 name="fileUploadInput"
                 className="file-selection"
+                accept="image/*"
                 onChange={(e) => {
                        setSelectedFiles(e.target.files);
                 }}/>
