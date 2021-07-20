@@ -4,7 +4,7 @@ import React, {useEffect, useState} from "react";
 import {fetch} from '@inrupt/solid-client-authn-browser';
 
 // Import from "@inrupt/solid-client"
-import {getFile, overwriteFile, saveFileInContainer,} from '@inrupt/solid-client';
+import {getFile, overwriteFile, saveFileInContainer, deleteFile} from '@inrupt/solid-client';
 
 // import {Shape, Card, Row, Col, CardGroup, Image, Container} from 'react-bootstrap';
 import {ImageList, ImageListItem} from '@material-ui/core';
@@ -22,7 +22,7 @@ function GridView(props) {
     let setLoadingAnim = props.setLoadingAnim;
     const [entries, setEntries] = useState([]);
     let currentPath = props.currentPath;
-    const [metadataFileExists, setMetadataFileExists] = useState(false);
+    //const [metadataFileExists, setMetadataFileExists] = useState(false);
 
     function isFolder(url) {
         return url.endsWith("/");
@@ -46,9 +46,11 @@ function GridView(props) {
         for (const entry of files) {
             // console.log(entry);
 
+            /*
             if (entry.url.endsWith("metadata.json")) {
                 await setMetadataFileExists(true);
             }
+            */
 
             let processedEntry = {
                 url: entry.url,
@@ -105,33 +107,45 @@ function GridView(props) {
         //
     }
 
+    /*
+    async function checkForMetaDataFile(){
+        for (const fileEntry of files){
+            if(fileEntry.url.endsWith("metadata.json")){
+                setMetadataFileExists(true);
+                console.log("metadataFile exists");
+            }
+        }
+        setMetadataFileExists(false);
+    }
+    */
+
+
     async function uploadMetadataFile(file, url) {
         console.log(url);
 
         // TODO: Add check for metadatFileExists here instead
+        let metadataFileExists = false;
+
+        
+
+        //await checkForMetaDataFile();
+
+        
 
         if (url !== "") {
-            if (!metadataFileExists) {
-                const savedFile = await saveFileInContainer(
-                    url,
-                    file,
-                    {
-                        slug: file.name,
-                        contentType: file.type, fetch: fetch
-                    }
-                );
-            } else {
-                console.log("wanting to overwrite");
-                const savedFile = await overwriteFile(
-                    url,
-                    file,
-                    {
-                        slug: file.name,
-                        contentType: file.type,
-                        fetch: fetch
-                    });
+         
+          
+            const savedFile = await overwriteFile(
+                url + file.name,
+                file,
+                {
+                    slug: file.name,
+                    contentType: file.type,
+                    fetch: fetch
+                });
+               
                 console.log("overwritten");
-            }
+            
         }
     }
 
@@ -139,6 +153,7 @@ function GridView(props) {
         getEntriesFromFiles(files).then(() =>
             uploadMetadataFile(metadataFile(), currentPath));
         console.log(currentPath);
+       // checkForMetaDataFile();
     }, [files, currentPath]);
 
     function renderEntry(folderEntry, idx) {
