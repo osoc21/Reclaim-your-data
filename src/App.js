@@ -142,7 +142,7 @@ function MenuBar(props)
     let gotoScreen = props.gotoScreen;
 
     return(
-        <AppBar position="static" className={classes.appBar}>
+        <AppBar position="sticky" className={classes.appBar}>
             <Toolbar>
                 <IconButton style={{color: "white"}} className={classes.topBarRightElem} edge="start"
                 aria-label="menu" onClick={() => {props.gotoScreen('/upload')}}>
