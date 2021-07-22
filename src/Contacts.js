@@ -1,7 +1,7 @@
 
 
 import { useState,React, useEffect } from "react";
-import {executeQuery, printBindings} from "./rdf";
+import {executeQuery} from "./rdf";
 import "./Contacts.css";
 import {
     useSession,
@@ -25,6 +25,7 @@ const defaultQuery = "SELECT * WHERE {?s ?p ?o}";
 function Contacts(props)
 {
 	let webId = props.webId;
+	let gotoScreen = props.gotoScreen;
 
 	const { session } = useSession();
 	const [bindings, setBindings] = useState([]);
@@ -62,18 +63,19 @@ function Contacts(props)
   		let binding = props.binding;
   		const boundVariables = binding['_root'].entries.map(e => e[0]);
 
-  		let username = binding['_root'].entries[1][1]['id'];
+  		let username = binding['_root'].entries[1][1]['id'].replace(/['"]+/g, '');
   		// username = username.replace("/(\"|\"$)/", '');
   		console.log("username:", username)
-  		let turtleFileUrl = binding['_root'].entries[0][1]['id'];
+  		let turtleFileUrl = binding['_root'].entries[0][1]['id'].replace(/['"]+/g, '');
+  		// let turtleFileId = turtleFileUrl.slice(0, turtleFileUrl.findLastOf('/'));
+  		// turtleFileId = turtleFileId.slice(turtleFileId.findLastOf('/'), -1);
   		// turtleFileUrl = turtleFileUrl.replace("/(\"|\"$)/", '');
 
   		return (
-		      	<div className="contact">
-		      		<PersonIcon/>
-		          	<p>{username}:</p>
-		          	<p>{turtleFileUrl}</p>
-		        </div>
+	      	<div className="contact">
+	      		<PersonIcon/>
+	          	<p className="contact-name" onClick={() => gotoScreen(`/contacts/${username}`, [turtleFileUrl])}>{username}</p>
+	        </div>
   		);
   	}
 	

@@ -5,6 +5,7 @@ import FileUpload from "./FileUpload";
 import Profile from "./Profile";
 import Contacts from "./Contacts";
 import Albums from "./Albums";
+import ContactDetails from "./ContactDetails";
 
 
 import React, {useState, useEffect} from "react";
@@ -145,7 +146,7 @@ function MenuBar(props)
         <AppBar position="static" className={classes.appBar}>
             <Toolbar>
                 <IconButton style={{color: "white"}} className={classes.topBarRightElem} edge="start"
-                aria-label="menu" onClick={() => {props.gotoScreen('/upload')}}>
+                aria-label="menu" onClick={async () => {await props.gotoScreen('/upload')}}>
                     <AddIcon/>
                 </IconButton>
             </Toolbar>
@@ -161,7 +162,7 @@ function BottomNavBar(props)
     let gotoScreen = props.gotoScreen;
     let [location, setLocation] = useState("/");
 
-    const handleChange = (event, newValue) => {setLocation(newValue); gotoScreen(newValue)};
+    const handleChange = async (event, newValue) => {await setLocation(newValue); await gotoScreen(newValue)};
 
 
     return(
@@ -182,13 +183,14 @@ function Home(props)
     let [notifMsg, setNotifMsg] = useState("");
     let [notifType, setNotifType] = useState("");
     let [loadingAnim, setLoadingAnim] = useState(false); // when first loading, show anim
+    let [urlHiddenParams, setUrlHiddenParams] = useState([]);
 
     let webId = props.webId;
     let podUrl = props.podUrl;
     let explorerPath = props.explorerPath;
     let setExplorerPath = props.setExplorerPath;
     let history = props.history;
-    
+
     // let match = useRouteMatch();
     const classes = props.classes;
 
@@ -202,9 +204,12 @@ function Home(props)
         setAnchorEl(null);
     };
 
-    function gotoScreen(screenPath)
+
+    async function gotoScreen(screenPath, hiddenParams = null)
     {
         console.log(`goto ${screenPath} ...`);
+        console.log(`hidden params:\n`, hiddenParams);
+        await setUrlHiddenParams(hiddenParams);
         history.push(`${screenPath}`);
     }
 
@@ -251,8 +256,9 @@ function Home(props)
                         <Profile/>
                     </Route>
                     <Route exact path="/contacts">
-                        <Contacts/>
+                        <Contacts gotoScreen={gotoScreen}/>
                     </Route>
+                    <Route path="/contacts/:username" render={(props) => <ContactDetails urlHiddenParams={urlHiddenParams} realProps={props} /> } />
                     <Route exact path="/albums">
                         <Albums/>
                     </Route>
