@@ -54,7 +54,7 @@ const useStyles = makeStyles({
     marginLeft: 'auto',
   },
   appBar: {
-    background: 'black',
+    background: 'rgba(0,0,0,0.9)',
   },
   bottomNavBtn: {
     color: "grey",
@@ -166,7 +166,7 @@ function BottomNavBar(props)
 
     return(
         <BottomNavigation className={classes.appBar} value={location} onChange={handleChange}
-        showLabels style={{position: 'fixed', width: "300px", borderRadius: "10px", bottom: "10px"}}>
+        showLabels style={{position: 'fixed', width: "100%", bottom: 0}}>
             <BottomNavigationAction className={btnClass} value="/" label="Photos" icon={<PhotoIcon/>} />
             <BottomNavigationAction className={btnClass} value="/albums" label="Albums" icon={<FolderIcon/>} />
             <BottomNavigationAction className={btnClass} value="/profile" label="Profile" icon={<AccountBoxIcon/>} />
@@ -212,8 +212,7 @@ function Home(props)
     {
         if (loadingAnim)
         {
-            return <CircularProgress size={100} 
-            style={{zIndex: 1600, position: "absolute", left:"50%", top:"50%",color: '#1a90ff'}}/>
+            return <CircularProgress size={100} style={{zIndex: 1600, position: "fixed", color: '#1a90ff'}}/>
         }
     }
 
@@ -239,9 +238,10 @@ function Home(props)
 
     return (<>
             <MenuBar classes={classes} history={history} gotoScreen={gotoScreen}/>
-            {showLoadingAnimation()}
             <Notification notifMsg={notifMsg} notifType={notifType}/>
+            {showLoadingAnimation()}
             <div className="content">
+                {/*</div>*/}
                 <Switch>
                     <Route exact path="/upload">
                         <FileUpload explorerPath={explorerPath} setNotifMsg={setNotifMsg}

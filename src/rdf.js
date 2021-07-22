@@ -11,7 +11,7 @@ import {
 
 
 const newEngine = require('@comunica/actor-init-sparql').newEngine;
-
+const queryEngine = newEngine();
 
 function printBindings(binding) {
     const boundVariables = binding['_root'].entries.map(e => e[0]);
@@ -21,22 +21,24 @@ function printBindings(binding) {
 }
 
 
-async function executeQuery (query, sources) {   
+async function executeQuery (query, sources, session) {   
     const comunicaSources = []
-    const queryEngine = newEngine();
+    
     for (let sourceFile of sources) {
         console.log("fetching", sourceFile, "...");
         const store = new Store();
-        const response = await fetch(sourceFile, { method: 'get' })
+        const response = await session.fetch(sourceFile, { method: 'get' });
         const textStream = require('streamify-string')(await response.text());
         const contentType = response.headers.get('Content-Type');
+        console.log("Content type:", contentType);
+        // const strippedUrl = sourceFile.split("#")[0];
         await new Promise((resolve, reject) => {
-            rdfParser.parse(textStream, { contentType: contentType.split(';')[0], baseIRI: 'http://example.org' })
+            rdfParser.parse(textStream, { contentType: contentType.split(';')[0], baseIRI: sourceFile })
             .on('data', (quad) => { console.log('QUAD', quad, store); store.addQuad(quad) })
             .on('error', (error) => reject(error))
             .on('end', async () => {resolve()})
         });
-        comunicaSources.push({ type: 'rdfjsSource', value: store })
+        comunicaSources.push({ type: 'rdfjsSource', value: store });
     }
     
     const result = await queryEngine.query(query, {sources: comunicaSources});

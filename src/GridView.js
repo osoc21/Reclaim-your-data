@@ -140,7 +140,7 @@ function GridView(props) {
     }
 
     useEffect(() => {
-        getEntriesFromFiles(files);
+        getEntriesFromFiles(files).then(() => {});
         // getEntriesFromFiles(files).then(() =>
         //     uploadMetadataFile(metadataFile(), currentPath));
         console.log(currentPath);
