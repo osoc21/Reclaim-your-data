@@ -1,20 +1,10 @@
 import React, {useEffect, useState} from "react";
-
-// Import from "@inrupt/solid-client-authn-browser"
 import {fetch} from '@inrupt/solid-client-authn-browser';
-
-// Import from "@inrupt/solid-client"
 import {getFile, overwriteFile, saveFileInContainer, deleteFile} from '@inrupt/solid-client';
-
-// import {Shape, Card, Row, Col, CardGroup, Image, Container} from 'react-bootstrap';
 import {ImageList, ImageListItem} from '@material-ui/core';
-
-
-// import InfoIcon from '@material-ui/icons/Info';
 import dms2dec from "dms2dec";
 import "./GridView.css";
 import exif from 'exif-js';
-
 
 function GridView(props) {
     let files = props.files;
@@ -22,7 +12,6 @@ function GridView(props) {
     let setLoadingAnim = props.setLoadingAnim;
     const [entries, setEntries] = useState([]);
     let currentPath = props.currentPath;
-    //const [metadataFileExists, setMetadataFileExists] = useState(false);
 
     useEffect(() => {
         // here we use props prefix, otherwise setLoadingAnim is not recognized
@@ -44,19 +33,9 @@ function GridView(props) {
     }
 
     async function getEntriesFromFiles(files) {
-        // console.log("Fetching");
-        // console.log(files);
         let processedEntries = [];
 
         for (const entry of files) {
-            // console.log(entry);
-
-            /*
-            if (entry.url.endsWith("metadata.json")) {
-                await setMetadataFileExists(true);
-            }
-            */
-
             let processedEntry = {
                 url: entry.url,
                 shortName: getName(entry.url),
@@ -70,12 +49,13 @@ function GridView(props) {
         await getExifData(processedEntries);
         await setEntries(processedEntries);
         sortByDate(processedEntries);
-        uploadMetadataFile(processedEntries,currentPath);
+        await uploadMetadataFile(processedEntries, currentPath);
     }
 
     async function getExifData(processedEntries) {
         for (const entry of processedEntries) {
             if (isImage(entry.url)) {
+                console.log(entry.url);
                 let raw = await getFile(entry.url, {fetch: fetch});
                 entry.imageUrl = URL.createObjectURL(raw);
 
@@ -99,7 +79,6 @@ function GridView(props) {
         }
     }
 
-
     function sortByDate(files) {
         return files.sort((a, b) => b.date - a.date);
     }
@@ -111,19 +90,19 @@ function GridView(props) {
         });
     }
 
-    async function updateMedataFile() {
-        //
+    async function updateMedataFile(path, metadataFile, contentToAdd) {
+        // FOR SOME LOVELY REASON, YOU HAVE TO PASS path + file.name to getFile, instead of a string consisting of the resource you want to access
+        // THUS, file PARAMETER IS MANDATORY HERE
+        let file = await getFile(path + metadataFile.name, {fetch: fetch});
+        let fileContent = [];
+        file.text().then(text => {fileContent = JSON.parse(text)});
+        // TODO: fileContent.push(contentToAdd);
     }
 
-    
     async function uploadMetadataFile(processedEntries, url) {
-        let metadataFileExists = false;
-
         if (url !== "" && processedEntries.length > 0) {
-            //console.log(JSON.stringify(processedEntries));
-
             let file = makeMetadataFile(processedEntries);
-          
+            await updateMedataFile(url, file);
             const savedFile = await overwriteFile(
                 url + file.name,
                 file,
@@ -132,32 +111,22 @@ function GridView(props) {
                     contentType: file.type,
                     fetch: fetch
                 });
-               
-                console.log("overwritten");
-            
         }
     }
 
     useEffect(() => {
         getEntriesFromFiles(files)
-        /*.then(() =>
-            uploadMetadataFile(currentPath));*/
-        console.log(currentPath);
-       // checkForMetaDataFile();
-    }, [files, currentPath]);
+    }, [files]);
 
 
-    function renderEntry(folderEntry, idx)
-    {
-        if((! folderEntry.isFolder) && folderEntry.imageUrl)
-        {
+    function renderEntry(folderEntry, idx) {
+        if ((!folderEntry.isFolder) && folderEntry.imageUrl) {
             return (<ImageListItem>
-                        <img loading="lazy" src={folderEntry.imageUrl} alt={folderEntry.imageUrl}/>
-                    </ImageListItem>);
+                <img loading="lazy" src={folderEntry.imageUrl} alt={folderEntry.imageUrl}/>
+            </ImageListItem>);
         }
         return null;
     }
-
 
     return (
         <div className="grid-view">
@@ -167,6 +136,5 @@ function GridView(props) {
         </div>
     );
 }
-
 
 export default GridView;
