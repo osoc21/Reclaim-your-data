@@ -2,7 +2,9 @@ import React, {useState} from "react"
 
 // Import from "@inrupt/solid-client"
 import {
-    saveFileInContainer
+    saveFileInContainer,
+    getFile, 
+    overwriteFile
 } from '@inrupt/solid-client';
 
 // Import from "@inrupt/solid-client-authn-browser"
@@ -50,10 +52,66 @@ function FileUpload(props) {
         {
             await setNotifType("success");
             await setNotifMsg("Files successfully uploaded !!");
+            await updateMetadataFile(currentPath, selectedFiles);
         }
 
 
         //TODO: add success/failure notification of uploading file(s)
+    }
+
+    function makeMetaDataEntry(file){
+        function getName(url) {
+            let regex = /^https:\/\/pod\.inrupt\.com(\/\w+)*\/(\w+)/;
+            const match = url.match(regex);
+            return match[match.length - 1];
+        }
+
+        function isFolder(url) {
+            return url.endsWith("/");
+        }
+
+        let fileUrl = currentPath + file.name;
+        let metadataEntry = {
+            url: fileUrl,
+            shortName: getName(fileUrl),
+            isFolder: isFolder(fileUrl),
+            imageUrl: null,
+            date: null
+        };
+        return metadataEntry;
+    }
+
+    function makeMetadataFile(jsObjects) {
+        const jsonString = `${JSON.stringify(jsObjects)}`;
+        return new File([jsonString], "metadata.json", {
+            type: "application/json"
+        });
+    }
+
+    async function updateMetadataFile(path, contentToAdd) {
+        let processedEntries = Array.from(contentToAdd).map(entry => makeMetaDataEntry(entry));
+        let metadataFile = makeMetadataFile(processedEntries);
+        
+        // FOR SOME LOVELY REASON, YOU HAVE TO PASS path + file.name to getFile, instead of a string consisting of the resource you want to access
+        // THUS, file PARAMETER IS MANDATORY HERE
+        let file = await getFile(path + metadataFile.name, {fetch: fetch});
+        let fileContent = [];
+        file.text().then(text => {fileContent = JSON.parse(text)});
+        //fileContent.push(contentToAdd);
+        processedEntries.forEach(entry => fileContent.push(entry));
+        metadataFile = makeMetadataFile(fileContent);
+        console.log(processedEntries);
+
+        const savedFile = await overwriteFile(
+            currentPath + metadataFile.name,
+            metadataFile,
+            {
+                slug: metadataFile.name,
+                contentType: metadataFile.type,
+                fetch: fetch
+            });
+
+        
     }
 
     /**

@@ -49,7 +49,7 @@ function GridView(props) {
         await getExifData(processedEntries);
         await setEntries(processedEntries);
         sortByDate(processedEntries);
-        await uploadMetadataFile(processedEntries, currentPath);
+        //await uploadMetadataFile(processedEntries, currentPath);
     }
 
     async function getExifData(processedEntries) {
@@ -102,7 +102,7 @@ function GridView(props) {
     async function uploadMetadataFile(processedEntries, url) {
         if (url !== "" && processedEntries.length > 0) {
             let file = makeMetadataFile(processedEntries);
-            await updateMedataFile(url, file);
+            //await updateMedataFile(url, file);
             const savedFile = await overwriteFile(
                 url + file.name,
                 file,
