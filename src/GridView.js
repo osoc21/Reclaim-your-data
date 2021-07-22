@@ -65,14 +65,14 @@ function GridView(props) {
                     let dateTime = exifData.DateTime ? exifData.DateTime.replace(":", "/").replace(":", "/") : undefined
                     //let latitude = exifData.GPSLatitude && exifData.GPSLatitude[0] ? exifData.GPSLatitude : null
                     //let longitude = exifData.GPSLongitude && exifData.GPSLongitude[0] ? exifData.GPSLongitude : null
-                    console.log(`exifdata`);
-                    console.log(dateTime);
+                    //console.log(`exifdata`);
+                    //console.log(dateTime);
                     entry.date = new Date(dateTime);
                     if (exifData.latitude != null && exifData.longitude != null) {
                         // note: the dms2dec lib expects 4 parameters, but we haven't found a way to parse if the picture
                         // was taken in the NESW direction, so at the moment it's hardcoded
                         // TODO: extract NESW direction from EXIF data
-                        console.log(dms2dec(exifData.latitude, "N", exifData.longitude, "E"));
+                        //console.log(dms2dec(exifData.latitude, "N", exifData.longitude, "E"));
                     }
                 }
             }

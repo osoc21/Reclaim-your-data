@@ -52,7 +52,7 @@ function FileUpload(props) {
         {
             await setNotifType("success");
             await setNotifMsg("Files successfully uploaded !!");
-            await updateMetadataFile(currentPath, selectedFiles);
+            await updateMetadataFile(selectedFiles);
         }
 
 
@@ -88,20 +88,34 @@ function FileUpload(props) {
         });
     }
 
-    async function updateMetadataFile(path, contentToAdd) {
+    async function updateMetadataFile(contentToAdd) {
         let processedEntries = Array.from(contentToAdd).map(entry => makeMetaDataEntry(entry));
         let metadataFile = makeMetadataFile(processedEntries);
-        
-        // FOR SOME LOVELY REASON, YOU HAVE TO PASS path + file.name to getFile, instead of a string consisting of the resource you want to access
-        // THUS, file PARAMETER IS MANDATORY HERE
-        let file = await getFile(path + metadataFile.name, {fetch: fetch});
-        let fileContent = [];
-        file.text().then(text => {fileContent = JSON.parse(text)});
-        //fileContent.push(contentToAdd);
-        processedEntries.forEach(entry => fileContent.push(entry));
-        metadataFile = makeMetadataFile(fileContent);
-        console.log(processedEntries);
+        let file = await getFile(currentPath + metadataFile.name, {fetch: fetch});
+        let fileContent = null;
+        // should be as simple as:
+        // oldFileContent = getFile(url)
+        // contentToAppend = processedEntries
+        // processedEntries.forEach(entry => oldFileContent.push(entry))
+        //makeMetadataFile(oldFileContent);
+        // but it's not
 
+        file.text().then(text => {
+            console.log("unparsed text: ", text);
+            console.log("parse text:");
+            console.log(JSON.parse(text));
+            fileContent = JSON.parse(text);
+
+            //fileContent.push(contentToAdd);
+            console.log("printing the old file content");
+            //fileContent.push(processedEntries);
+            //processedEntries.forEach(entry => fileContent.push(entry));
+            fileContent = fileContent.concat(processedEntries);
+
+            console.log("printing the new file content");
+            console.log(fileContent);
+            metadataFile = makeMetadataFile(fileContent);
+        });
         const savedFile = await overwriteFile(
             currentPath + metadataFile.name,
             metadataFile,
