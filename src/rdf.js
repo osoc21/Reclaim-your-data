@@ -11,17 +11,18 @@ import {
 
 const newEngine = require('@comunica/actor-init-sparql').newEngine;
 
-const queryEngine = newEngine();
+
 
 function printBindings(binding) {
+    
     const boundVariables = binding['_root'].entries.map(e => e[0]);
     for (let variable of boundVariables){
         console.log(variable, " | " ,binding.get(variable).value)
     }
 }
-const executeQuery = async (query, sources) => {   
+const executeQuery = async (query, sources, setBindings) => {   
     const comunicaSources = []
-
+    const queryEngine = newEngine();
     for (let sourceFile of sources) {
         const store = new Store();
         const response = await fetch(sourceFile, { method: 'get' })

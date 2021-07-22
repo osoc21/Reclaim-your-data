@@ -16,12 +16,18 @@ const defaultQuery = "SELECT * WHERE {?s ?p ?o}"
 function Contacts(props)
 {
 	let webId = props.webId;
-	
+	const { session } = useSession();
+	function test(){
+		executeQuery(defaultQuery,webId,setBindings).then((res)=>{ 
+			console.log(res);
+			for (let binding of res){
+				printBindings(binding);
+			}
+		});
+	}
+	const [bindings, setBindings] = useState([])
 	useEffect(() => {
-		let res = executeQuery(defaultQuery,defaultSource);
-		for (let binding of res){
-			printBindings(binding);
-		}
+		test();
 	}, [webId])
 	
 	
