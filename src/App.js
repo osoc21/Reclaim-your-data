@@ -213,7 +213,7 @@ function Home(props)
         if (loadingAnim)
         {
             return <CircularProgress size={100} 
-            style={{zIndex: 1600, position: "fixed", color: '#1a90ff'}}/>
+            style={{zIndex: 1600, position: "absolute", left:"50%", top:"50%",color: '#1a90ff'}}/>
         }
     }
 

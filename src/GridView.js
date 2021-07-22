@@ -24,10 +24,10 @@ function GridView(props) {
     let currentPath = props.currentPath;
     //const [metadataFileExists, setMetadataFileExists] = useState(false);
 
-    useEffect(() => {
-        // here we use props prefix, otherwise setLoadingAnim is not recognized
-        getEntriesFromFiles(files);
-    }, [files]);
+    // useEffect(() => {
+    //     // here we use props prefix, otherwise setLoadingAnim is not recognized
+    //     getEntriesFromFiles(files);
+    // }, [files]);
 
     function isFolder(url) {
         return url.endsWith("/");
@@ -67,9 +67,9 @@ function GridView(props) {
 
             processedEntries.push(processedEntry);
         }
-        await getExifData(processedEntries);
+        // await getExifData(processedEntries);
         await setEntries(processedEntries);
-        sortByDate(processedEntries);
+        // sortByDate(processedEntries);
     }
 
     async function getExifData(processedEntries) {
@@ -140,8 +140,9 @@ function GridView(props) {
     }
 
     useEffect(() => {
-        getEntriesFromFiles(files).then(() =>
-            uploadMetadataFile(metadataFile(), currentPath));
+        getEntriesFromFiles(files);
+        // getEntriesFromFiles(files).then(() =>
+        //     uploadMetadataFile(metadataFile(), currentPath));
         console.log(currentPath);
        // checkForMetaDataFile();
     }, [files, currentPath]);

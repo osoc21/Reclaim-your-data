@@ -46,10 +46,15 @@ function FileUpload(props) {
             await setNotifType("error");
             await setNotifMsg(errorMsg);
         }
-        else
+        else if (selectedFiles.length > 0)
         {
             await setNotifType("success");
             await setNotifMsg("Files successfully uploaded !!");
+        }
+        else if (selectedFiles.length == 0)
+        {
+            await setNotifType("info");
+            await setNotifMsg("Nothing to upload.");
         }
 
 
