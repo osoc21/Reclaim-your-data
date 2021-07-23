@@ -146,7 +146,7 @@ function MenuBar(props)
         <AppBar position="static" className={classes.appBar}>
             <Toolbar>
                 <IconButton style={{color: "white"}} className={classes.topBarRightElem} edge="start"
-                aria-label="menu" onClick={async () => {await props.gotoScreen('/upload')}}>
+                aria-label="menu" onClick={async () => {await props.gotoScreen('/upload', null, false)}}>
                     <AddIcon/>
                 </IconButton>
             </Toolbar>
