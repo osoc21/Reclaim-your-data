@@ -21,6 +21,7 @@
 
 .app-div
 {
+  position: absolute;
   margin: 0;
   padding: 0;
   width: 100%;
@@ -37,7 +38,9 @@
 
 .content
 {
-  padding: 20px;
+  height:  100%;
+  width: 100%;
+  padding: 20px 20px 70px 20px; /* slightly more at bottom, account for bottom nav*/
 }
 
 

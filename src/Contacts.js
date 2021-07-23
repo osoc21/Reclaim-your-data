@@ -3,9 +3,7 @@
 import { useState,React, useEffect } from "react";
 import {executeQuery} from "./rdf";
 import "./Contacts.css";
-import {
-    useSession,
-  } from "@inrupt/solid-ui-react";
+import {useSession} from "@inrupt/solid-ui-react";
 
 import PersonIcon from '@material-ui/icons/Person';
 
@@ -61,7 +59,7 @@ function Contacts(props)
   	function Contact(props)
   	{
   		let binding = props.binding;
-  		const boundVariables = binding['_root'].entries.map(e => e[0]);
+  		// const boundVariables = binding['_root'].entries.map(e => e[0]);
 
   		let username = binding['_root'].entries[1][1]['id'].replace(/['"]+/g, '');
   		// username = username.replace("/(\"|\"$)/", '');
@@ -81,8 +79,8 @@ function Contacts(props)
 	
 	return (
 		<div>
-          {bindings.map(binding => {
-          		console.log("Binding:", binding); return (<Contact binding={binding}/>)
+          {bindings.map((binding, idx) => {
+          		console.log("Binding:", binding); return (<Contact key={idx} binding={binding}/>)
           	}) }
       	</div>
 	);

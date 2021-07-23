@@ -1,3 +1,6 @@
+
+import "./FileUpload.css"
+
 import React, {useState} from "react"
 
 // Import from "@inrupt/solid-client"
@@ -9,6 +12,10 @@ import {
 import {
     fetch
 } from '@inrupt/solid-client-authn-browser';
+
+import Button from '@material-ui/core/Button';
+import CloudUploadIcon from '@material-ui/icons/CloudUpload';
+import SendIcon from '@material-ui/icons/Send';
 
 
 function FileUpload(props) {
@@ -35,7 +42,7 @@ function FileUpload(props) {
             // promise is undefined if the upload wasn't sucessful
             if (! res)
             {
-                errorMsg += "Could not upload '" + selectedFiles[i].name + "', the file might already exist.\n";
+                errorMsg += "'" + selectedFiles[i].name + "'";
             }
            
         }
@@ -44,7 +51,7 @@ function FileUpload(props) {
         if (errorMsg !== "")
         {
             await setNotifType("error");
-            await setNotifMsg(errorMsg);
+            await setNotifMsg("Could not upload file(s), they might already exist: " + errorMsg);
         }
         else if (selectedFiles.length > 0)
         {
@@ -93,21 +100,24 @@ function FileUpload(props) {
 
     function selectedFilesToReact() {
         let res = [];
-
+        let i = 0;
         // selectedFiles is iterable but not an array, 
         // so map() and forEach() functions don't work
         for (let file of selectedFiles) {
-            res.push(<li>{file.name}</li>);
+            res.push(<li key={i}>{file.name}</li>);
+            ++i;
         }
 
         return res;
     }
 
-    function showSelectedFiles() {
+    function showUploadSection() {
         return (
-            <div className="SelectedFilesDiv">
-                <p>Selected files:</p>
+            <div className="upload-section">
+                <h4>Selected files:</h4>
                 <ul>{selectedFilesToReact()}</ul>
+                <Button variant="contained" color="primary" onClick={upload}
+                endIcon={<SendIcon/>}>Upload</Button>
             </div>
         );
     }
@@ -115,10 +125,13 @@ function FileUpload(props) {
     return (
         <div>
             <h1>Upload files</h1>
-            <p>Current path: {currentPath}</p>
-            <button className="Button" onClick={openFileSelectionWindow}>Add file(s)</button>
-            {showSelectedFiles()}
-            <button className="Button" onClick={upload}>Upload</button>
+            <h4>Destination:</h4>
+            <p>{currentPath}</p>
+            <Button variant="contained" color="primary" onClick={openFileSelectionWindow}
+            startIcon={<CloudUploadIcon/>}>
+                Select file(s)
+            </Button>
+            {selectedFiles.length > 0 ? showUploadSection() : null}
             <input id="file-input" type="file" multiple="multiple"
                 name="fileUploadInput"
                 className="file-selection"

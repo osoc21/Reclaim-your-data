@@ -162,8 +162,9 @@ function BottomNavBar(props)
     let gotoScreen = props.gotoScreen;
     let [location, setLocation] = useState("/");
 
-    const handleChange = async (event, newValue) => {await setLocation(newValue); await gotoScreen(newValue)};
-
+    // NOTICE: we false as last parameter of gotoScreen, because we consider all the navigation tabs independent
+    // and as such we want hidden parameters to be updated after the screen change to not cause errors
+    const handleChange = async (event, newValue) => {await setLocation(newValue); await gotoScreen(newValue, null, false)};
 
     return(
         <BottomNavigation className={classes.appBar} value={location} onChange={handleChange}
@@ -181,7 +182,7 @@ function BottomNavBar(props)
 function Home(props)
 {
     let [notifMsg, setNotifMsg] = useState("");
-    let [notifType, setNotifType] = useState("");
+    let [notifType, setNotifType] = useState("info");
     let [loadingAnim, setLoadingAnim] = useState(false); // when first loading, show anim
     let [urlHiddenParams, setUrlHiddenParams] = useState([]);
 
@@ -205,19 +206,35 @@ function Home(props)
     };
 
 
-    async function gotoScreen(screenPath, hiddenParams = null)
+    async function gotoScreen(screenPath, hiddenParams = null, updateHiddenParamsBefore=true)
     {
         console.log(`goto ${screenPath} ...`);
         console.log(`hidden params:\n`, hiddenParams);
-        await setUrlHiddenParams(hiddenParams);
+
+        // By default, we update the hidden params before redirecting.
+        // This way, the newpage will have the proper parameters set before rendering
+        if (updateHiddenParamsBefore)
+        {
+            await setUrlHiddenParams(hiddenParams);
+        }
+        await setLoadingAnim(false); // always cancel loading anim when switching screen
         history.push(`${screenPath}`);
+
+        // Some screens rely on hidden params as props, hence they will show an error
+        // if we change the hidden param before changing location (since everything is reference in JS).
+        // In that case, we can avoid the problem by setting updateHiddenParamsBefore to false,
+        // hence updating such prop after the screen change.
+        if (! updateHiddenParamsBefore)
+        {
+            await setUrlHiddenParams(hiddenParams);
+        }
     }
 
     function showLoadingAnimation()
     {
         if (loadingAnim)
         {
-            return <CircularProgress size={100} style={{zIndex: 1600, position: "fixed", color: '#1a90ff'}}/>
+            return <CircularProgress color="secondary" size={100} style={{zIndex: 1700, opacity: ".7", position: "fixed", top: "45vh"}}/>
         }
     }
 
@@ -242,12 +259,15 @@ function Home(props)
     }
 
     return (<>
+            {showLoadingAnimation()}
             <MenuBar classes={classes} history={history} gotoScreen={gotoScreen}/>
             <Notification notifMsg={notifMsg} notifType={notifType}/>
-            {showLoadingAnimation()}
             <div className="content">
                 {/*</div>*/}
                 <Switch>
+                    <Route exact path="/redirect">
+                        <h1>Redirecting...</h1>
+                    </Route>
                     <Route exact path="/upload">
                         <FileUpload explorerPath={explorerPath} setNotifMsg={setNotifMsg}
                         setNotifType={setNotifType} setLoadingAnim={setLoadingAnim}/>

@@ -106,7 +106,7 @@ function FileExplorer(props) {
         getFilesFromResourceURL(POD_URL).then((fileArray) => {
             setCurrentPath(POD_URL);
             setFiles(fileArray);
-            setLoadingAnim(false);
+            // setLoadingAnim(false);
         });
         
     }

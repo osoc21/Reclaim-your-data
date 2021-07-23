@@ -1,8 +1,23 @@
 
 .contact {
+	margin:  0;
+	padding: 10px;
+	max-width: 600px;
 	display: flex;
-	flex-direction:  row;
+	flex-direction: row;
+	/*box-sizing: border-box;  allow the borders to consider */
+	
 }
+
+
+.contact:not(:first-child){
+	border-top: 1px solid grey;
+}
+
+.contact:last-child{
+	border-bottom: 1px solid grey;
+}
+
 
 
 .contact-name
@@ -14,5 +29,6 @@
 {
 	/*border-left: 3px solid cyan;*/
 	color: cyan;
+	background-color:  red;
 }
 

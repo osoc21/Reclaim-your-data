@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useState, useRef} from "react";
 
 // Import from "@inrupt/solid-client-authn-browser"
 import {fetch} from '@inrupt/solid-client-authn-browser';
@@ -22,12 +22,16 @@ function GridView(props) {
     let setLoadingAnim = props.setLoadingAnim;
     const [entries, setEntries] = useState([]);
     let currentPath = props.currentPath;
+    let loadedImagesCounter = useRef(0);
+    let nbImages = useRef(0);
     //const [metadataFileExists, setMetadataFileExists] = useState(false);
 
-    // useEffect(() => {
-    //     // here we use props prefix, otherwise setLoadingAnim is not recognized
-    //     getEntriesFromFiles(files);
-    // }, [files]);
+    useEffect(() => {
+        nbImages.current = 0;
+        loadedImagesCounter.current = 0;
+        // here we use props prefix, otherwise setLoadingAnim is not recognized
+        getEntriesFromFiles(files);
+    }, [files]);
 
     function isFolder(url) {
         return url.endsWith("/");
@@ -67,36 +71,67 @@ function GridView(props) {
 
             processedEntries.push(processedEntry);
         }
-        // await getExifData(processedEntries);
+        await fetchImageData(processedEntries);
         await setEntries(processedEntries);
         // sortByDate(processedEntries);
     }
 
-    async function getExifData(processedEntries) {
-        for (const entry of processedEntries) {
-            if (isImage(entry.url)) {
+    async function fetchImageData(processedEntries) 
+    {
+        for (const entry of processedEntries) 
+        {
+            if (isImage(entry.url)) 
+            {
+                nbImages.current += 1;
                 let raw = await getFile(entry.url, {fetch: fetch});
                 entry.imageUrl = URL.createObjectURL(raw);
 
-                let arrayBuffer = await new Response(raw).arrayBuffer();
-                let exifData = exif.readFromBinaryFile(arrayBuffer);
-                if (exifData) {
-                    let dateTime = exifData.DateTime ? exifData.DateTime.replace(":", "/").replace(":", "/") : undefined
-                    //let latitude = exifData.GPSLatitude && exifData.GPSLatitude[0] ? exifData.GPSLatitude : null
-                    //let longitude = exifData.GPSLongitude && exifData.GPSLongitude[0] ? exifData.GPSLongitude : null
-                    console.log(`exifdata`);
-                    console.log(dateTime);
-                    entry.date = new Date(dateTime);
-                    if (exifData.latitude != null && exifData.longitude != null) {
-                        // note: the dms2dec lib expects 4 parameters, but we haven't found a way to parse if the picture
-                        // was taken in the NESW direction, so at the moment it's hardcoded
-                        // TODO: extract NESW direction from EXIF data
-                        console.log(dms2dec(exifData.latitude, "N", exifData.longitude, "E"));
-                    }
-                }
+                // let arrayBuffer = await new Response(raw).arrayBuffer();
+                // let exifData = exif.readFromBinaryFile(arrayBuffer);
+
+                // if (exifData) {
+                //     let dateTime = exifData.DateTime ? exifData.DateTime.replace(":", "/").replace(":", "/") : undefined
+                //     //let latitude = exifData.GPSLatitude && exifData.GPSLatitude[0] ? exifData.GPSLatitude : null
+                //     //let longitude = exifData.GPSLongitude && exifData.GPSLongitude[0] ? exifData.GPSLongitude : null
+                //     console.log(`exifdata`);
+                //     console.log(dateTime);
+                //     entry.date = new Date(dateTime);
+                //     if (exifData.latitude != null && exifData.longitude != null) {
+                //         // note: the dms2dec lib expects 4 parameters, but we haven't found a way to parse if the picture
+                //         // was taken in the NESW direction, so at the moment it's hardcoded
+                //         // TODO: extract NESW direction from EXIF data
+                //         console.log(dms2dec(exifData.latitude, "N", exifData.longitude, "E"));
+                //     }
+                // }
             }
         }
     }
+
+    // async function getExifData(entry) {
+    //     for (const entry of processedEntries) {
+    //         if (isImage(entry.url)) {
+    //             let raw = await getFile(entry.url, {fetch: fetch});
+    //             entry.imageUrl = URL.createObjectURL(raw);
+
+    //             let arrayBuffer = await new Response(raw).arrayBuffer();
+    //             let exifData = exif.readFromBinaryFile(arrayBuffer);
+    //             if (exifData) {
+    //                 let dateTime = exifData.DateTime ? exifData.DateTime.replace(":", "/").replace(":", "/") : undefined
+    //                 //let latitude = exifData.GPSLatitude && exifData.GPSLatitude[0] ? exifData.GPSLatitude : null
+    //                 //let longitude = exifData.GPSLongitude && exifData.GPSLongitude[0] ? exifData.GPSLongitude : null
+    //                 console.log(`exifdata`);
+    //                 console.log(dateTime);
+    //                 entry.date = new Date(dateTime);
+    //                 if (exifData.latitude != null && exifData.longitude != null) {
+    //                     // note: the dms2dec lib expects 4 parameters, but we haven't found a way to parse if the picture
+    //                     // was taken in the NESW direction, so at the moment it's hardcoded
+    //                     // TODO: extract NESW direction from EXIF data
+    //                     console.log(dms2dec(exifData.latitude, "N", exifData.longitude, "E"));
+    //                 }
+    //             }
+    //         }
+    //     }
+    // }
 
 
     function sortByDate(files) {
@@ -139,25 +174,35 @@ function GridView(props) {
         }
     }
 
-    useEffect(() => {
-        getEntriesFromFiles(files).then(() => {});
-        // getEntriesFromFiles(files).then(() =>
-        //     uploadMetadataFile(metadataFile(), currentPath));
-        console.log(currentPath);
-       // checkForMetaDataFile();
-    }, [files, currentPath]);
+    // useEffect(() => {
+    //     getEntriesFromFiles(files);
+    //     console.log(currentPath);
+    //    // checkForMetaDataFile();
+    // }, [files, currentPath]);
 
+    /** If called with a counter of loaded images higher than the size of the entries array,
+     * stops the loading animation. */
+    function updateLoadingAnim()
+    {
+        // console.log(loadedImagesCounter.current, "<", nbImages, "?");
+        loadedImagesCounter.current += 1;
+        if (loadedImagesCounter >= nbImages)
+        {
+            setLoadingAnim(false);
+        }
+    }
 
     function renderEntry(folderEntry, idx)
     {
         if((! folderEntry.isFolder) && folderEntry.imageUrl)
         {
-            return (<ImageListItem>
-                        <img loading="lazy" src={folderEntry.imageUrl} alt={folderEntry.imageUrl}/>
+            return (<ImageListItem key={idx}>
+                        <img onLoad={updateLoadingAnim} loading="lazy" src={folderEntry.imageUrl} alt={folderEntry.imageUrl}/>
                     </ImageListItem>);
         }
         return null;
     }
+
 
 
     return (
