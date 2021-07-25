@@ -79,7 +79,8 @@ function Contacts(props)
 	
 	return (
 		<div>
-          {bindings.map((binding, idx) => {
+			<h1>Contacts</h1>
+          	{bindings.map((binding, idx) => {
           		console.log("Binding:", binding); return (<Contact key={idx} binding={binding}/>)
           	}) }
       	</div>
