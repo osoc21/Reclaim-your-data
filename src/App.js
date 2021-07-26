@@ -273,7 +273,7 @@ function Home(props)
                         setNotifType={setNotifType} setLoadingAnim={setLoadingAnim}/>
                     </Route>
                     <Route exact path="/profile">
-                        <Profile/>
+                        <Profile webId={webId} podUrl={podUrl}/>
                     </Route>
                     <Route exact path="/contacts">
                         <Contacts gotoScreen={gotoScreen}/>
