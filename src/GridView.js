@@ -12,20 +12,31 @@ function GridView(props) {
     let setLoadingAnim = props.setLoadingAnim;
     const [entries, setEntries] = useState([]);
     let currentPath = props.currentPath;
+    // TODO: add comments
     let loadedImagesCounter = useRef(0);
     let nbImages = useRef(0);
 
     useEffect(() => {
         nbImages.current = 0;
         loadedImagesCounter.current = 0;
-        // here we use props prefix, otherwise setLoadingAnim is not recognized
         getEntriesFromFiles(files);
     }, [files]);
 
+    /**
+     * Checks if a url is the url of a folder.
+     * @param {String} url 
+     * @returns {Boolean}
+     */
     function isFolder(url) {
         return url.endsWith("/");
     }
 
+    /**
+     * Checks if a url is the url of an image.
+     * It currently supports .jpg/.jpeg/.png extentions.
+     * @param {String} url 
+     * @returns {Boolean}
+     */
     function isImage(url) {
         return url.endsWith(".jpg") || url.endsWith(".jpeg") || url.endsWith(".png");
     }
@@ -33,9 +44,14 @@ function GridView(props) {
     function getName(url) {
         let regex = /^https:\/\/pod\.inrupt\.com(\/\w+)*\/(\w+)/;
         const match = url.match(regex);
+        // get last matched part in order to support nested folders
         return match[match.length - 1];
     }
 
+    /**
+     * Sorts files by descending dates
+     * @param {FileList} files - list of files
+     */
     function sortByDate(files) {
         return files.sort((a, b) => b.date - a.date);
     }
