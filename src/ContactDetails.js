@@ -1,4 +1,3 @@
-
 import React, {useState, useEffect} from "react";
 import {executeQuery} from "./rdf";
 import {getPODUrlFromWebId} from './pod';
@@ -8,14 +7,13 @@ import {useSession} from "@inrupt/solid-ui-react";
 const getWebIdFromPersonFileQuery = "SELECT ?o WHERE { ?s <http://www.w3.org/2006/vcard/ns#value> ?o }";
 // using webid as source
 const getRoleQuery = "SELECT ?o WHERE { ?s <http://www.w3.org/2006/vcard/ns#role> ?o }";
-const getPODProviderUrlQuery = "SELECT ?o WHERE { ?s <http://www.w3.org/ns/solid/terms#oidcIssuer> ?o }";
+// const getPODProviderUrlQuery = "SELECT ?o WHERE { ?s <http://www.w3.org/ns/solid/terms#oidcIssuer> ?o }";
 const getEmailCardUrlQuery = "SELECT ?o WHERE { ?s <http://www.w3.org/2006/vcard/ns#hasEmail> ?o }";
 // using email card url
 const getEmailFromEmailCardUrlQuery = "SELECT ?o WHERE { ?s <http://www.w3.org/2006/vcard/ns#value> ?o }";
 
 function ContactDetails(props)
 {
-	console.log("data:", props);
 	let contactUsername = props.realProps.match.params.username; //data.public;
 	let contactPersonFileUrl = props.urlHiddenParams[0]; //data.hidden;
 	let [contactWebId,setContactWebId] = useState("");
@@ -34,37 +32,36 @@ function ContactDetails(props)
 	{
 		let resBindings = await executeQuery(getWebIdFromPersonFileQuery, [contactPersonFileUrl], session);
 		let parsedWebId = parseSingleResult(resBindings);
-		console.log("parsed contact webid:", parsedWebId);
+		//console.log("parsed contact webid:", parsedWebId);
 		setContactWebId(parsedWebId);
 		let newContactPodUrl =  getPODUrlFromWebId(parsedWebId);
 		setContactPodUrl(newContactPodUrl);
 		resBindings = await executeQuery(getRoleQuery, [parsedWebId], session);
-		console.log("role res:", resBindings);
+		//console.log("role res:", resBindings);
 		if (resBindings.length > 0)
 		{
 			let parsedRole = parseSingleResult(resBindings);
 			setRole(parsedRole);
 		}
 		resBindings = await executeQuery(getEmailCardUrlQuery, [parsedWebId], session);
-		console.log("email card url res:", resBindings);
+		//console.log("email card url res:", resBindings);
 		if (resBindings.length > 0)
 		{
 			let parsedEmailCardUrl = parseSingleResult(resBindings);
 			resBindings = await executeQuery(getEmailFromEmailCardUrlQuery, [parsedEmailCardUrl], session);
-			console.log("email res:", resBindings);
+			//console.log("email res:", resBindings);
 			if (resBindings.length > 0)
 			{
 				let parsedEmail = parseSingleResult(resBindings);
 				setEmail(parsedEmail);
 			}
 		}
-		// let email = 
+		// let email =
 	}
 
 	useEffect(() => {
 		getContactDetailsFromPersonFile();
 	}, [contactPersonFileUrl]);
-
 	
 	function showField(field)
 	{
