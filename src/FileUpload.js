@@ -14,7 +14,13 @@ import Button from '@material-ui/core/Button';
 import CloudUploadIcon from '@material-ui/icons/CloudUpload';
 import SendIcon from '@material-ui/icons/Send';
 
-
+/**
+ * FileUpload JSX.Element.
+ *
+ * @param props
+ * @returns {JSX.Element}
+ * @constructor
+ */
 function FileUpload(props) {
     let currentPath = props.explorerPath;
     let [selectedFiles, setSelectedFiles] = useState([]);
@@ -22,6 +28,12 @@ function FileUpload(props) {
     let setNotifType = props.setNotifType;
     let setLoadingAnim = props.setLoadingAnim;
 
+    /**
+     * Upload the selected files to the pod.
+     *
+     * @async
+     * @returns {Promise<void>}
+     */
     async function upload() {
         let promiseArray = [];
         await setLoadingAnim(true);
@@ -35,12 +47,12 @@ function FileUpload(props) {
         for (let i = 0; i < promiseResults.length; ++i) {
             let res = promiseResults[i];
 
-            // promise is undefined if the upload wasn't sucessful
+            // promise is undefined if the upload wasn't successful
             if (!res) {
                 errorMsg += "'" + selectedFiles[i].name + "'";
             }
-
         }
+
         await setLoadingAnim(false);
 
         // there is an error or more
@@ -57,13 +69,31 @@ function FileUpload(props) {
         }
     }
 
+    /**
+     * Return an object with keys **date**, **isFolder**, **imageUrl**, **shortName**, **url**.
+     *
+     * @param file {File} `File object.`
+     * @returns {{date: Date, isFolder: boolean, imageUrl: string, shortName: string, url: string}} `JS Object`
+     */
     function makeMetaDataEntry(file) {
+        /**
+         * Return the name of the file associated with the provided URL.
+         *
+         * @param url {string} `URL to the file.`
+         * @returns {string} `Name of file.`
+         */
         function getName(url) {
             let regex = /^https:\/\/pod\.inrupt\.com(\/\w+)*\/(\w+)/;
             const match = url.match(regex);
             return match[match.length - 1];
         }
 
+        /**
+         * Checks whether or not the provided URL is a folder.
+         *
+         * @param url {string} `URL`
+         * @returns {boolean} boolean
+         */
         function isFolder(url) {
             return url.endsWith("/");
         }
@@ -79,15 +109,29 @@ function FileUpload(props) {
         return metadataEntry;
     }
 
+    /**
+     * Return a metadata.json file containing the entries of the files in the pod.
+     *
+     * @param jsObjects {Object[]}
+     * @returns {File} File
+     */
     function makeMetadataFile(jsObjects) {
+        // parse the incoming JS objects to a string for the File API
         const jsonString = `${JSON.stringify(jsObjects)}`;
         return new File([jsonString], "metadata.json", {
             type: "application/json"
         });
     }
 
-    async function updateMetadataFile(contentToAdd) {
-        let processedEntries = Array.from(contentToAdd).map(entry => makeMetaDataEntry(entry));
+    /**
+     * Update the entries in metadata.json file with newly uploaded files to the pod.
+     *
+     * @async
+     * @returns {void} void
+     * @param {[File]} newFileEntries `Array of File to add.`
+     */
+    async function updateMetadataFile(newFileEntries) {
+        let processedEntries = Array.from(newFileEntries).map(entry => makeMetaDataEntry(entry));
         let metadataFile = makeMetadataFile(processedEntries);
         let file = await getFile(currentPath + metadataFile.name, {fetch: fetch});
         let fileContent = await file.text();
@@ -108,9 +152,10 @@ function FileUpload(props) {
 
     /**
      * Upload file into the targetContainer.
-     * @param  {[type]} file               [description]
-     * @param  {[type]} targetContainerURL [description]
-     * @return {[type]}                    [description]
+     * @async
+     * @param  {File} file
+     * @param  {URL} targetContainerURL
+     * @return {string} Filename
      */
     async function placeFileInContainer(file, targetContainerURL) {
         try {
@@ -129,10 +174,21 @@ function FileUpload(props) {
         }
     }
 
+    /**
+     * Open the file selection dialog.
+     *
+     * @returns void
+     */
     function openFileSelectionWindow() {
         document.querySelector("#file-input").click();
     }
 
+    /**
+     * Convert the selected files to upload to an array of JSX.Element.
+     * Note that the `<li>` is **NOT** HTML, but a JSX.Element.
+     *
+     * @returns {[JSX.Element]} Array of JSX.Element.
+     */
     function selectedFilesToReact() {
         let res = [];
         let i = 0;
@@ -146,6 +202,12 @@ function FileUpload(props) {
         return res;
     }
 
+
+    /**
+     * Return a JSX.Element with the selected images for uploading.
+     *
+     * @returns {JSX.Element}
+     */
     function showUploadSection() {
         return (
             <div className="upload-section">
