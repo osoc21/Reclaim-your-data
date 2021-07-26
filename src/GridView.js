@@ -41,6 +41,11 @@ function GridView(props) {
         return url.endsWith(".jpg") || url.endsWith(".jpeg") || url.endsWith(".png");
     }
 
+    /**
+     * Gets the name of the deepest folder or file in the url.
+     * @param {String} url 
+     * @returns {String} name of the deepest folder or file in the url
+     */
     function getName(url) {
         let regex = /^https:\/\/pod\.inrupt\.com(\/\w+)*\/(\w+)/;
         const match = url.match(regex);
@@ -51,6 +56,7 @@ function GridView(props) {
     /**
      * Sorts files by descending dates
      * @param {FileList} files - list of files
+     * @returns {FileList} sorted list of files
      */
     function sortByDate(files) {
         return files.sort((a, b) => b.date - a.date);
@@ -111,6 +117,12 @@ function GridView(props) {
         }
     }
 
+    /**
+     * Makes an ImageListItem for each image.
+     * @param {Object} folderEntry - entry that needs to be rendered.
+     * @param {Number} idx - index of entry in array is used as key for React list item.
+     * @returns {ReactComponent} 
+     */
     function renderEntry(folderEntry, idx) {
         if ((!folderEntry.isFolder) && folderEntry.imageUrl) {
             return (<ImageListItem key={idx}>
@@ -120,6 +132,9 @@ function GridView(props) {
         return null;
     }
 
+    /**
+     * Renders the ImageList with ImageListItems to be shown in the app.
+     */
     return (
         <div className="grid-view">
             <ImageList rowHeight={160} cols={4}>
