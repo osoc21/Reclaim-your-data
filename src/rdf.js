@@ -1,14 +1,6 @@
-import { useState,React } from "react";
+import { React } from "react";
 import rdfParser from "rdf-parse";
 import { Store } from "n3";
-import {
-    useSession,
-  } from "@inrupt/solid-ui-react";
-
-import {
-	getDefaultSession,
-	} from "@inrupt/solid-client-authn-browser";
-
 
 const newEngine = require('@comunica/actor-init-sparql').newEngine;
 const queryEngine = newEngine();
@@ -21,11 +13,10 @@ function printBindings(binding) {
 }
 
 
-async function executeQuery (query, sources, session) {   
-    const comunicaSources = []
-    
+async function executeQuery (query, sources, session) {
+    const comunicaSources = [];
+
     for (let sourceFile of sources) {
-        console.log("fetching", sourceFile, "...");
         const store = new Store();
         const response = await session.fetch(sourceFile, { method: 'get' });
         const textStream = require('streamify-string')(await response.text());
@@ -40,7 +31,7 @@ async function executeQuery (query, sources, session) {
         });
         comunicaSources.push({ type: 'rdfjsSource', value: store });
     }
-    
+
     const result = await queryEngine.query(query, {sources: comunicaSources});
 
     // Consume results as an array (easier)
