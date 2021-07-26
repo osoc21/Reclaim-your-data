@@ -81,6 +81,10 @@ function GridView(props) {
         sortByDate(processedEntries);
     }
 
+    /**
+     * Gets image file URL (Blob) and data like EXIF DateTime and potentially location from images stored on the Solid pod.
+     * @param {Object} processedEntries 
+     */
     async function fetchImageData(processedEntries) {
         for (const entry of processedEntries) {
             if (isImage(entry.url)) {
