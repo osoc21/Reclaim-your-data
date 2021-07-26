@@ -1,15 +1,11 @@
 import "./FileUpload.css"
-
 import React, {useState} from "react"
-
-// Import from "@inrupt/solid-client"
 import {
     saveFileInContainer,
     getFile,
     overwriteFile
 } from '@inrupt/solid-client';
 
-// Import from "@inrupt/solid-client-authn-browser"
 import {
     fetch
 } from '@inrupt/solid-client-authn-browser';
@@ -29,12 +25,13 @@ function FileUpload(props) {
     async function upload() {
         let promiseArray = [];
         await setLoadingAnim(true);
-        console.log("uploading ...");
+
         for (let file of selectedFiles) {
             promiseArray.push(placeFileInContainer(file, currentPath));
         }
         let promiseResults = await Promise.all(promiseArray);
         let errorMsg = "";
+
         for (let i = 0; i < promiseResults.length; ++i) {
             let res = promiseResults[i];
 
@@ -45,6 +42,7 @@ function FileUpload(props) {
 
         }
         await setLoadingAnim(false);
+
         // there is an error or more
         if (errorMsg !== "") {
             await setNotifType("error");
@@ -120,23 +118,20 @@ function FileUpload(props) {
                 targetContainerURL,           // Container URL
                 file,                         // File
                 {
-                    slug: file.name, // file.name.split('.')[0]
+                    slug: file.name,
                     contentType: file.type, fetch: fetch
                 }
             );
             return file.name;
-            // await setNotifType("error");
-            // await setNotifMsg("file '" + file.name + "' already exists.");
         } catch (error) {
-            console.error("ERROR CAUGHT:", error);
-
+            //console.log("ERROR CAUGHT:", error);
+            // Any error is handled in the UI, no need to print it to the console.
         }
     }
 
     function openFileSelectionWindow() {
         document.querySelector("#file-input").click();
     }
-
 
     function selectedFilesToReact() {
         let res = [];
