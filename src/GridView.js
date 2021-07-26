@@ -1,6 +1,6 @@
 import React, {useEffect, useState, useRef} from "react";
 import {fetch} from '@inrupt/solid-client-authn-browser';
-import {getFile} from '@inrupt/solid-client';
+import {getFile,    overwriteFile} from '@inrupt/solid-client';
 import {ImageList, ImageListItem} from '@material-ui/core';
 import dms2dec from "dms2dec";
 import "./GridView.css";
@@ -10,6 +10,7 @@ function GridView(props) {
     let files = props.files;
     let setLoadingAnim = props.setLoadingAnim;
     const [entries, setEntries] = useState([]);
+    let currentPath = props.currentPath;
     // TODO: add comments
     let loadedImagesCounter = useRef(0);
     let nbImages = useRef(0);
@@ -17,7 +18,8 @@ function GridView(props) {
     useEffect(() => {
         nbImages.current = 0;
         loadedImagesCounter.current = 0;
-        getEntriesFromFiles(files);
+        //getEntriesFromFiles(files);
+        readMetadataFile()
     }, [files]);
 
     /**
@@ -60,6 +62,53 @@ function GridView(props) {
         return files.sort((a, b) => b.date - a.date);
     }
 
+    async function readMetadataFile(){
+        let dummyMetadataFile = new File([], "metadata.json", {
+            type: "application/json"
+        }); 
+        console.log(currentPath + dummyMetadataFile.name);
+        let metadataFile = await getFile(currentPath + dummyMetadataFile.name, {fetch: fetch});
+        let fileContent = await metadataFile.text();
+        const parsedContent = JSON.parse(fileContent);
+
+        if(parsedContent.length > 0){
+            console.log("fetchingImageData");
+            await fetchImageData(parsedContent);
+            await setEntries(parsedContent);
+        } /* else {
+            console.log("getting entries from files");
+            getEntriesFromFiles(files);
+        }
+        */
+
+        
+        sortByDate(parsedContent);
+        
+
+    }
+
+    /*
+
+    function makeMetadataFile(jsObjects) {
+        const jsonString = `${JSON.stringify(jsObjects)}`;
+        return new File([jsonString], "metadata.json", {
+            type: "application/json"
+        });
+    }
+
+    async function updateMetadataFile(processedEntries) {
+        let metadataFile = makeMetadataFile(processedEntries);
+ 
+        const savedFile = await overwriteFile(
+            currentPath + metadataFile.name,
+            metadataFile,
+            {
+                slug: metadataFile.name,
+                contentType: metadataFile.type,
+                fetch: fetch
+            });
+    }
+
     async function getEntriesFromFiles(files) {
         let processedEntries = [];
 
@@ -76,8 +125,10 @@ function GridView(props) {
         }
         await fetchImageData(processedEntries);
         await setEntries(processedEntries);
-        sortByDate(processedEntries);
+        updateMetadataFile(processedEntries);
+        //sortByDate(processedEntries);
     }
+    */
 
     /**
      * Gets image file URL (Blob) and data like EXIF DateTime and potentially location from images stored on the Solid pod.
@@ -86,10 +137,12 @@ function GridView(props) {
     async function fetchImageData(processedEntries) {
         for (const entry of processedEntries) {
             if (isImage(entry.url)) {
+                console.log("fetching EXIF");
                 let raw = await getFile(entry.url, {fetch: fetch});
                 entry.imageUrl = URL.createObjectURL(raw);
 
-                let arrayBuffer = await new Response(raw).arrayBuffer();
+                if(entry.date === null){
+                    let arrayBuffer = await new Response(raw).arrayBuffer();
                 let exifData = exif.readFromBinaryFile(arrayBuffer);
                 if (exifData) {
                     let dateTime = exifData.DateTime ? exifData.DateTime.replace(":", "/").replace(":", "/") : undefined
@@ -104,6 +157,7 @@ function GridView(props) {
                         // TODO: extract NESW direction from EXIF data
                         //console.log(dms2dec(exifData.latitude, "N", exifData.longitude, "E"));
                     }
+                }
                 }
                 // sortByDate(processedEntries);
             }
