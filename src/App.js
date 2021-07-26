@@ -5,6 +5,7 @@ import FileUpload from "./FileUpload";
 import Profile from "./Profile";
 import Contacts from "./Contacts";
 import Albums from "./Albums";
+import ContactDetails from "./ContactDetails";
 
 
 import React, {useState, useEffect} from "react";
@@ -54,7 +55,7 @@ const useStyles = makeStyles({
     marginLeft: 'auto',
   },
   appBar: {
-    background: 'black',
+    background: 'rgba(0,0,0,0.9)',
   },
   bottomNavBtn: {
     color: "grey",
@@ -148,7 +149,7 @@ function MenuBar(props)
                     WePod
                 </Typography>
                 <IconButton style={{color: "white"}} className={classes.topBarRightElem} edge="start"
-                aria-label="menu" onClick={() => {props.gotoScreen('/upload')}}>
+                aria-label="menu" onClick={async () => {await props.gotoScreen('/upload', null, false)}}>
                     <AddIcon/>
                 </IconButton>
             </Toolbar>
@@ -164,12 +165,13 @@ function BottomNavBar(props)
     let gotoScreen = props.gotoScreen;
     let [location, setLocation] = useState("/");
 
-    const handleChange = (event, newValue) => {setLocation(newValue); gotoScreen(newValue)};
-
+    // NOTICE: we false as last parameter of gotoScreen, because we consider all the navigation tabs independent
+    // and as such we want hidden parameters to be updated after the screen change to not cause errors
+    const handleChange = async (event, newValue) => {await setLocation(newValue); await gotoScreen(newValue, null, false)};
 
     return(
         <BottomNavigation className={classes.appBar} value={location} onChange={handleChange}
-        showLabels style={{position: 'fixed', width: "300px", borderRadius: "10px", bottom: "10px"}}>
+        showLabels style={{position: 'fixed', width: "100%", bottom: 0}}>
             <BottomNavigationAction className={btnClass} value="/" label="Photos" icon={<PhotoIcon/>} />
             <BottomNavigationAction className={btnClass} value="/albums" label="Albums" icon={<FolderIcon/>} />
             <BottomNavigationAction className={btnClass} value="/profile" label="Profile" icon={<AccountBoxIcon/>} />
@@ -183,15 +185,16 @@ function BottomNavBar(props)
 function Home(props)
 {
     let [notifMsg, setNotifMsg] = useState("");
-    let [notifType, setNotifType] = useState("");
+    let [notifType, setNotifType] = useState("info");
     let [loadingAnim, setLoadingAnim] = useState(false); // when first loading, show anim
+    let [urlHiddenParams, setUrlHiddenParams] = useState([]);
 
     let webId = props.webId;
     let podUrl = props.podUrl;
     let explorerPath = props.explorerPath;
     let setExplorerPath = props.setExplorerPath;
     let history = props.history;
-    
+
     // let match = useRouteMatch();
     const classes = props.classes;
 
@@ -205,18 +208,36 @@ function Home(props)
         setAnchorEl(null);
     };
 
-    function gotoScreen(screenPath)
+
+    async function gotoScreen(screenPath, hiddenParams = null, updateHiddenParamsBefore=true)
     {
         console.log(`goto ${screenPath} ...`);
+        console.log(`hidden params:\n`, hiddenParams);
+
+        // By default, we update the hidden params before redirecting.
+        // This way, the newpage will have the proper parameters set before rendering
+        if (updateHiddenParamsBefore)
+        {
+            await setUrlHiddenParams(hiddenParams);
+        }
+        await setLoadingAnim(false); // always cancel loading anim when switching screen
         history.push(`${screenPath}`);
+
+        // Some screens rely on hidden params as props, hence they will show an error
+        // if we change the hidden param before changing location (since everything is reference in JS).
+        // In that case, we can avoid the problem by setting updateHiddenParamsBefore to false,
+        // hence updating such prop after the screen change.
+        if (! updateHiddenParamsBefore)
+        {
+            await setUrlHiddenParams(hiddenParams);
+        }
     }
 
     function showLoadingAnimation()
     {
         if (loadingAnim)
         {
-            return <CircularProgress size={100} 
-            style={{zIndex: 1600, position: "fixed", color: '#1a90ff'}}/>
+            return <CircularProgress color="secondary" size={100} style={{zIndex: 1700, opacity: ".7", position: "fixed", top: "45vh"}}/>
         }
     }
 
@@ -241,21 +262,26 @@ function Home(props)
     }
 
     return (<>
-            <MenuBar classes={classes} history={history} gotoScreen={gotoScreen}/>
             {showLoadingAnimation()}
+            <MenuBar classes={classes} history={history} gotoScreen={gotoScreen}/>
             <Notification notifMsg={notifMsg} notifType={notifType}/>
             <div className="content">
+                {/*</div>*/}
                 <Switch>
+                    <Route exact path="/redirect">
+                        <h1>Redirecting...</h1>
+                    </Route>
                     <Route exact path="/upload">
                         <FileUpload explorerPath={explorerPath} setNotifMsg={setNotifMsg}
                         setNotifType={setNotifType} setLoadingAnim={setLoadingAnim}/>
                     </Route>
                     <Route exact path="/profile">
-                        <Profile/>
+                        <Profile webId={webId} podUrl={podUrl}/>
                     </Route>
                     <Route exact path="/contacts">
-                        <Contacts/>
+                        <Contacts gotoScreen={gotoScreen} podUrl={podUrl}/>
                     </Route>
+                    <Route path="/contacts/:username" render={(props) => <ContactDetails urlHiddenParams={urlHiddenParams} realProps={props} /> } />
                     <Route exact path="/albums">
                         <Albums/>
                     </Route>

@@ -15,7 +15,7 @@ function FileExplorer(props) {
     const POD_URL = props.podUrl;
 
     let [files, setFiles] = useState([]);
-    
+
     let setLoadingAnim = props.setLoadingAnim;
     let currentPath = props.explorerPath;
     let setCurrentPath = props.setExplorerPath;
@@ -106,11 +106,9 @@ function FileExplorer(props) {
         getFilesFromResourceURL(POD_URL).then((fileArray) => {
             setCurrentPath(POD_URL);
             setFiles(fileArray);
-            setLoadingAnim(false);
+            // setLoadingAnim(false);
         });
-        
     }
-
 
     // only read files if not already in the array (avoid infinite refreshes !!!)
     // but also if the current path is the root (it's possible that we're not in the

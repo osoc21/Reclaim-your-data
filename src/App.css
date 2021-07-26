@@ -21,6 +21,7 @@
 
 .app-div
 {
+  position: absolute;
   margin: 0;
   padding: 0;
   width: 100%;
@@ -43,7 +44,25 @@
     left-right:  8px inner padding
     bottom:  56px toolbar + 10px from bottom + 8px inner padding
   */
-  padding: 62px 8px 74px;
+  height:  100%;
+  width: 100%;
+  padding: 20px 20px 70px 20px; /* slightly more at bottom, account for bottom nav*/
 }
 
 
+/*.tmpDiv
+{
+  z-index: 1600;
+  overflow-y: scroll;
+  top: 0;
+  margin: 0;
+  padding: 0;
+  position: fixed;
+  width: 100vw;
+  height: 100vh;
+  background-color: transparent;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}*/

@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useState, useRef} from "react";
 import {fetch} from '@inrupt/solid-client-authn-browser';
 import {getFile, overwriteFile, saveFileInContainer, deleteFile} from '@inrupt/solid-client';
 import {ImageList, ImageListItem} from '@material-ui/core';
@@ -12,8 +12,12 @@ function GridView(props) {
     let setLoadingAnim = props.setLoadingAnim;
     const [entries, setEntries] = useState([]);
     let currentPath = props.currentPath;
+    let loadedImagesCounter = useRef(0);
+    let nbImages = useRef(0);
 
     useEffect(() => {
+        nbImages.current = 0;
+        loadedImagesCounter.current = 0;
         // here we use props prefix, otherwise setLoadingAnim is not recognized
         getEntriesFromFiles(files);
     }, [files]);
@@ -32,6 +36,10 @@ function GridView(props) {
         return match[match.length - 1];
     }
 
+    function sortByDate(files) {
+        return files.sort((a, b) => b.date - a.date);
+    }
+
     async function getEntriesFromFiles(files) {
         let processedEntries = [];
 
@@ -46,13 +54,13 @@ function GridView(props) {
 
             processedEntries.push(processedEntry);
         }
-        await getExifData(processedEntries);
+        await fetchImageData(processedEntries);
         await setEntries(processedEntries);
         sortByDate(processedEntries);
         //await uploadMetadataFile(processedEntries, currentPath);
     }
 
-    async function getExifData(processedEntries) {
+    async function fetchImageData(processedEntries) {
         for (const entry of processedEntries) {
             if (isImage(entry.url)) {
                 console.log(entry.url);
@@ -75,54 +83,24 @@ function GridView(props) {
                         //console.log(dms2dec(exifData.latitude, "N", exifData.longitude, "E"));
                     }
                 }
+                // sortByDate(processedEntries);
             }
         }
     }
 
-    function sortByDate(files) {
-        return files.sort((a, b) => b.date - a.date);
-    }
-
-    function makeMetadataFile(jsObjects) {
-        const jsonString = `${JSON.stringify(jsObjects)}`;
-        return new File([jsonString], "metadata.json", {
-            type: "application/json"
-        });
-    }
-
-    async function updateMedataFile(path, metadataFile, contentToAdd) {
-        // FOR SOME LOVELY REASON, YOU HAVE TO PASS path + file.name to getFile, instead of a string consisting of the resource you want to access
-        // THUS, file PARAMETER IS MANDATORY HERE
-        let file = await getFile(path + metadataFile.name, {fetch: fetch});
-        let fileContent = [];
-        file.text().then(text => {fileContent = JSON.parse(text)});
-        // TODO: fileContent.push(contentToAdd);
-    }
-
-    async function uploadMetadataFile(processedEntries, url) {
-        if (url !== "" && processedEntries.length > 0) {
-            let file = makeMetadataFile(processedEntries);
-            //await updateMedataFile(url, file);
-            const savedFile = await overwriteFile(
-                url + file.name,
-                file,
-                {
-                    slug: file.name,
-                    contentType: file.type,
-                    fetch: fetch
-                });
+    /** If called with a counter of loaded images higher than the size of the entries array,
+     * stops the loading animation. */
+    function updateLoadingAnim() {
+        loadedImagesCounter.current += 1;
+        if (loadedImagesCounter >= nbImages) {
+            setLoadingAnim(false);
         }
     }
 
-    useEffect(() => {
-        getEntriesFromFiles(files)
-    }, [files]);
-
-
     function renderEntry(folderEntry, idx) {
         if ((!folderEntry.isFolder) && folderEntry.imageUrl) {
-            return (<ImageListItem>
-                <img loading="lazy" src={folderEntry.imageUrl} alt={folderEntry.imageUrl}/>
+            return (<ImageListItem key={idx}>
+                <img onLoad={updateLoadingAnim} loading="lazy" src={folderEntry.imageUrl} alt={folderEntry.imageUrl}/>
             </ImageListItem>);
         }
         return null;
