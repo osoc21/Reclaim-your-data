@@ -92,7 +92,7 @@ function MenuBar(props) {
     let gotoScreen = props.gotoScreen;
 
     return (
-        <AppBar position="fixed" className={classes.appBar}>
+        <AppBar position="sticky" className={classes.appBar}>
             <Toolbar>
                 <Typography variant="h6" color="inherit">
                     WePod
