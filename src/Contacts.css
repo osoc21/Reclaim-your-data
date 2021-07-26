@@ -1,35 +1,25 @@
-
 .contact {
-	margin:  0;
-	padding: 10px;
-	max-width: 600px;
-	display: flex;
-	flex-direction: row;
-	/*box-sizing: border-box;  allow the borders to consider */
-	
+    margin: 0;
+    padding: 10px;
+    max-width: 600px;
+    display: flex;
+    flex-direction: row;
 }
 
 
-.contact:not(:first-child){
-	border-top: 1px solid grey;
+.contact:not(:first-child) {
+    border-top: 1px solid grey;
 }
 
-.contact:last-child{
-	border-bottom: 1px solid grey;
+.contact:last-child {
+    border-bottom: 1px solid grey;
 }
 
-
-
-.contact-name
-{
-	padding-left: 5px;
+.contact-name {
+    padding-left: 5px;
 }
 
-.contact-name:hover
-{
-	/*border-left: 3px solid cyan;*/
-	color: cyan;
-	cursor:  pointer;
-	/*background-color:  red;*/
+.contact-name:hover {
+    color: cyan;
+    cursor: pointer;
 }
-
