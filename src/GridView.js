@@ -8,10 +8,8 @@ import exif from 'exif-js';
 
 function GridView(props) {
     let files = props.files;
-    let openFolder = props.openFolder;
     let setLoadingAnim = props.setLoadingAnim;
     const [entries, setEntries] = useState([]);
-    let currentPath = props.currentPath;
     // TODO: add comments
     let loadedImagesCounter = useRef(0);
     let nbImages = useRef(0);
