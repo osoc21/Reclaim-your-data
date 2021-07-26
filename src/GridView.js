@@ -1,6 +1,6 @@
 import React, {useEffect, useState, useRef} from "react";
 import {fetch} from '@inrupt/solid-client-authn-browser';
-import {getFile, overwriteFile, saveFileInContainer, deleteFile} from '@inrupt/solid-client';
+import {getFile} from '@inrupt/solid-client';
 import {ImageList, ImageListItem} from '@material-ui/core';
 import dms2dec from "dms2dec";
 import "./GridView.css";
@@ -57,13 +57,11 @@ function GridView(props) {
         await fetchImageData(processedEntries);
         await setEntries(processedEntries);
         sortByDate(processedEntries);
-        //await uploadMetadataFile(processedEntries, currentPath);
     }
 
     async function fetchImageData(processedEntries) {
         for (const entry of processedEntries) {
             if (isImage(entry.url)) {
-                console.log(entry.url);
                 let raw = await getFile(entry.url, {fetch: fetch});
                 entry.imageUrl = URL.createObjectURL(raw);
 
