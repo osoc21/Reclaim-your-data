@@ -1,18 +1,12 @@
-
 import "./Login.css";
 import {getPODUrlFromWebId} from './pod';
-
 import React from "react";
-
 import {Button} from '@material-ui/core';
-
-// Import from "@inrupt/solid-client-authn-browser"
 import {
   login,
   handleIncomingRedirect,
   getDefaultSession,
 } from '@inrupt/solid-client-authn-browser';
-
 
 function Login(props) {
 	let setLoggedIn = props.setLoggedIn;
