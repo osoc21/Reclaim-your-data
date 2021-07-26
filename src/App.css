@@ -37,7 +37,13 @@
 
 .content
 {
-  padding: 20px;
+  /*
+    This is to offset
+    top:  56px toolbar + 8px inner padding
+    left-right:  8px inner padding
+    bottom:  56px toolbar + 10px from bottom + 8px inner padding
+  */
+  padding: 62px 8px 74px;
 }
 
 
