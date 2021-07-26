@@ -72,9 +72,6 @@ function Home(props) {
         <Notification setNotifMsg={setNotifMsg} notifMsg={notifMsg} notifType={notifType}/>
         <div className="content">
             <Switch>
-                {/*<Route exact path="/redirect">
-                    <h1>Redirecting...</h1>
-                </Route>*/}
                 <Route exact path="/upload">
                     <FileUpload explorerPath={explorerPath} setNotifMsg={setNotifMsg}
                                 setNotifType={setNotifType} setLoadingAnim={setLoadingAnim}/>
