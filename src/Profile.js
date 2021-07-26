@@ -18,7 +18,15 @@ const getEmailCardUrlQuery = "SELECT ?o WHERE { ?s <http://www.w3.org/2006/vcard
 // using email card url
 const getEmailFromEmailCardUrlQuery = "SELECT ?o WHERE { ?s <http://www.w3.org/2006/vcard/ns#value> ?o }";
 
-
+/**
+ * The Profile component displays the information about the current logged-in user.
+ * The information includes the web id, the pod url, the role, the username and the email.
+ * Other information might be considered in the future, like the POD provider or phone numbers
+ * and the like.
+ *
+ * @component
+ * @param {[type]} props The webid (string) and the pod url (string)
+ */
 function Profile(props)
 {
 	const WEB_ID = props.webId;
@@ -33,11 +41,22 @@ function Profile(props)
 		getProfileData();
 	}, [POD_URL]);
 
+	/**
+	 * Simple convenience function that parses a single result in the bindings of a query.
+	 * Ideally, this function should be replaced by functions from the inrupt client API (e.g. getThing).
+	 * @param  {[type]} bindings The results of the query, from which the result should be parsed
+	 * @return {[type]}          The parsed result
+	 */
 	function parseSingleResult(bindings)
 	{
 		return bindings[0]['_root'].entries[0][1]['id'].replace(/['"]+/g, '');
 	}
 
+	/**
+	 * Fetch the data of the user using the web id. The function is currently a mixture
+	 * of inrupt API functions and custom queries for the email.
+	 * @return {[type]} [description]
+	 */
 	async function getProfileData()
 	{
 		const profileDocumentURI = WEB_ID.split('#')[0];
@@ -112,6 +131,12 @@ function Profile(props)
 	// 	}
 	// }
 
+	/**
+	 * This functions displays a <p> element containing the argument if defined,
+	 * otherwise returns a <p> element containing a dash character.
+	 * @param  {[type]} field [description]
+	 * @return {[type]}       [description]
+	 */
 	function showField(field)
 	{
 		return (<p>{field ? field : "-"}</p>);

@@ -12,10 +12,19 @@ const getEmailCardUrlQuery = "SELECT ?o WHERE { ?s <http://www.w3.org/2006/vcard
 // using email card url
 const getEmailFromEmailCardUrlQuery = "SELECT ?o WHERE { ?s <http://www.w3.org/2006/vcard/ns#value> ?o }";
 
+/**
+ * The ContactDetails component gathers information about a given contact.
+ * The data is fetched from the POD using a 'person-file' url received from the parent
+ * Contacts component. Note that this file url is not received as a prop of the router which
+ * has to pass by the url, but as a hidden state variable of the app.
+ *
+ * @component
+ * @param {[type]} props [description]
+ */
 function ContactDetails(props)
 {
 	let contactUsername = props.realProps.match.params.username; //data.public;
-	let contactPersonFileUrl = props.urlHiddenParams[0]; //data.hidden;
+	let contactPersonFileUrl = props.routingHiddenParams[0]; //data.hidden;
 	let [contactWebId,setContactWebId] = useState("");
 	let [contactPodUrl, setContactPodUrl] = useState("");
 	let [role, setRole] = useState("");
@@ -23,11 +32,23 @@ function ContactDetails(props)
 
 	const { session } = useSession();
 
+	/**
+	 * Simple convenience function that parses a single result in the bindings of a query.
+	 * Ideally, this function should be replaced by functions from the inrupt client API (e.g. getThing).
+	 * @param  {[type]} bindings The results of the query, from which the result should be parsed
+	 * @return {[type]}          The parsed result
+	 */
 	function parseSingleResult(bindings)
 	{
 		return bindings[0]['_root'].entries[0][1]['id'].replace(/['"]+/g, '');
 	}
 
+	/**
+	 * This function use hardcoded predicates to query the person file and get information
+	 * like the role, email or webid of a contact. This function could be refactored
+	 * to use functions and vocabulary (e.g. VCARD) from the inrupt library.
+	 * @return {[type]} [description]
+	 */
 	async function getContactDetailsFromPersonFile()
 	{
 		let resBindings = await executeQuery(getWebIdFromPersonFileQuery, [contactPersonFileUrl], session);
@@ -63,6 +84,12 @@ function ContactDetails(props)
 		getContactDetailsFromPersonFile();
 	}, [contactPersonFileUrl]);
 	
+	/**
+	 * This functions displays a <p> element containing the argument if defined,
+	 * otherwise returns a <p> element containing a dash character.
+	 * @param  {[type]} field [description]
+	 * @return {[type]}       [description]
+	 */
 	function showField(field)
 	{
 		return (<p>{field ? field : "-"}</p>);

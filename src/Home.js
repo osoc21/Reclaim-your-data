@@ -15,11 +15,38 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 import { Switch, Route } from "react-router-dom";
 
 
+/**
+ * The Home component handles the application logic and UI once logged-in to access the POD. The component
+ * relies on react router to switch between pages, with the root being the image gallery. The component
+ * also contains menu bars to interact with the content, and can display notifications and loading animations.
+ *
+ * @component
+ * @param {[type]} props [description]
+ */
 function Home(props) {
+    /**
+     * State containing notification messages.
+     */
     let [notifMsg, setNotifMsg] = useState("");
+
+    /**
+     * State containing the notification type, which should be a string value accepted
+     * by the material UI Alert component ("error", "info", "warning", "success").
+     *
+     * @see {@link https://material-ui.com/components/alert/}
+     * 
+     */
     let [notifType, setNotifType] = useState("info");
-    let [loadingAnim, setLoadingAnim] = useState(false); // when first loading, show anim
-    let [urlHiddenParams, setUrlHiddenParams] = useState([]);
+
+    /**
+     * Boolean state telling whether or not a loading animation is to be displayed.
+     */
+    let [loadingAnim, setLoadingAnim] = useState(false);
+
+    /**
+     * State containing hidden routing parameters.
+     */
+    let [routingHiddenParams, setRoutingHiddenParams] = useState([]);
 
     let webId = props.webId;
     let podUrl = props.podUrl;
@@ -29,39 +56,49 @@ function Home(props) {
 
     const classes = props.classes;
 
-    const [anchorEl, setAnchorEl] = useState(null);
-
-    const handleClick = (event) => {
-        setAnchorEl(event.currentTarget);
-    };
-
-    const handleClose = () => {
-        setAnchorEl(null);
-    };
-
-
-    async function gotoScreen(screenPath, hiddenParams = null, updateHiddenParamsBefore = true) {
-        // By default, we update the hidden params before redirecting.
-        // This way, the newpage will have the proper parameters set before rendering
-        if (updateHiddenParamsBefore) {
-            await setUrlHiddenParams(hiddenParams);
+   
+    /**
+     * This function changes the route that should be taken by the router by appending
+     * the new path to the browser history, and cancels any loading animation running.
+     * Hidden parameters can also be passed to the function
+     * without being exposed in the url (displayed in the browser). This is particularly useful
+     * when the data contains sepcial characters that could mess with the routing (e.g. ':', '#' or '/')
+     * or when the parameter is too long and makes it difficult to debug the routing by looking at the 
+     * browser url. Notice that if hiddenParams is not empty, it means that the page we want to load
+     * expects these parameters to be set beforehand, hence we first set the hidden parameters
+     * before initiating the page switch. On the other hand, if the hiddenParams is null,
+     * then we first want to render the new page before assigning null to the routingHiddenParams state.
+     * This is because the previous page might have a prop that references the routingHiddenParam state,
+     * hence setting it to null while the component is still there would generate an error.
+     * @param  {[type]}  screenPath               [description]
+     * @param  {[type]}  hiddenParams             [description]
+     * @param  {Boolean} updateHiddenParamsBefore [description]
+     * @return {[type]}                           [description]
+     */
+    async function gotoScreen(screenPath, hiddenParams = null) {
+        // hiddenParams is defined and not null
+        // ==> update the state before moving to the new page
+        if (hiddenParams) {
+            await setRoutingHiddenParams(hiddenParams);
         }
+
         await setLoadingAnim(false); // always cancel loading anim when switching screen
         history.push(`${screenPath}`);
 
-        // Some screens rely on hidden params as props, hence they will show an error
-        // if we change the hidden param before changing location (since everything is reference in JS).
-        // In that case, we can avoid the problem by setting updateHiddenParamsBefore to false,
-        // hence updating such prop after the screen change.
-        if (!updateHiddenParamsBefore) {
-            await setUrlHiddenParams(hiddenParams);
+        // hiddenParams is null, so we set it after the page change
+        if (! hiddenParams) {
+            await setRoutingHiddenParams(null);
         }
     }
 
+    /**
+     * Displays a loading animation centered on the screen if the loadingAnim state is set to true.
+     * The animation is top level, hence it has a z-index higher than the other components.
+     */
     function showLoadingAnimation() {
         if (loadingAnim) {
             return <CircularProgress color="secondary" size={100}
-                                     style={{zIndex: 1700, opacity: ".7", position: "fixed", top: "45vh"}}/>
+                    style={{zIndex: 1700, opacity: ".7", position: "fixed", top: "45vh"}}/>
         }
     }
 
@@ -83,7 +120,7 @@ function Home(props) {
                     <Contacts gotoScreen={gotoScreen} podUrl={podUrl}/>
                 </Route>
                 <Route path="/contacts/:username"
-                       render={(props) => <ContactDetails urlHiddenParams={urlHiddenParams} realProps={props}/>}/>
+                       render={(props) => <ContactDetails routingHiddenParams={routingHiddenParams} realProps={props}/>}/>
                 <Route exact path="/albums">
                     <Albums/>
                 </Route>

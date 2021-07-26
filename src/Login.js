@@ -8,6 +8,15 @@ import {
   getDefaultSession,
 } from '@inrupt/solid-client-authn-browser';
 
+
+/**
+ * The Login component takes care of going to the proper POD provider login page, and handles
+ * the redirect after submitting the credentials. On success, the component initializes
+ * the web id, the pod url and the loggin flag of the app.
+ *
+ * @component
+ * @param {[type]} props [description]
+ */
 function Login(props) {
 	let setLoggedIn = props.setLoggedIn;
 	let setWebId = props.setWebId;

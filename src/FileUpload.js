@@ -15,6 +15,14 @@ import CloudUploadIcon from '@material-ui/icons/CloudUpload';
 import SendIcon from '@material-ui/icons/Send';
 
 
+/**
+ * The file upload component allows the user to select files, and once done,
+ * display the upload button that can be clicked on the send the files on the POD.
+ *
+ * @component
+ * @param {[type]} props The current path url (string), the notification message and type (strings)
+ * and the loading animation status (bool).
+ */
 function FileUpload(props) {
     let currentPath = props.explorerPath;
     let [selectedFiles, setSelectedFiles] = useState([]);
@@ -22,6 +30,14 @@ function FileUpload(props) {
     let setNotifType = props.setNotifType;
     let setLoadingAnim = props.setLoadingAnim;
 
+    /**
+     * Calls placeFileInContainer for each selected file,
+     * placing all the Promises in an array before waiting for them to 
+     * finish. Once all async operations are completed, the function checks if any of them
+     * failed, and if so, displays an error notification. If every operation succeeds, displays
+     * a success notification.
+     * @return {[type]} [description]
+     */
     async function upload() {
         let promiseArray = [];
         await setLoadingAnim(true);
