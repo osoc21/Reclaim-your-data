@@ -46,7 +46,7 @@ function FileUpload(props) {
         // there is an error or more
         if (errorMsg !== "") {
             await setNotifType("error");
-            await setNotifMsg(errorMsg);
+            await setNotifMsg("Could not upload file(s). The file(s) might already exist: " + errorMsg);
         } else if (selectedFiles.length > 0) {
             await setNotifType("success");
             await setNotifMsg("Files successfully uploaded !!");
