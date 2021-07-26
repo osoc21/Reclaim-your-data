@@ -3,7 +3,7 @@ import React, {useState} from "react"
 // Import from "@inrupt/solid-client"
 import {
     saveFileInContainer,
-    getFile, 
+    getFile,
     overwriteFile
 } from '@inrupt/solid-client';
 
@@ -29,27 +29,22 @@ function FileUpload(props) {
         }
         let promiseResults = await Promise.all(promiseArray);
         let errorMsg = "";
-        for (let i = 0 ; i < promiseResults.length ; ++i)
-        {
+        for (let i = 0; i < promiseResults.length; ++i) {
             let res = promiseResults[i];
             // console.log(res)
-             
+
             // promise is undefined if the upload wasn't sucessful
-            if (! res)
-            {
+            if (!res) {
                 errorMsg += "Could not upload '" + selectedFiles[i].name + "', the file might already exist.\n";
             }
-           
+
         }
         await setLoadingAnim(false);
         // there is an error or more
-        if (errorMsg !== "")
-        {
+        if (errorMsg !== "") {
             await setNotifType("error");
             await setNotifMsg(errorMsg);
-        }
-        else
-        {
+        } else {
             await setNotifType("success");
             await setNotifMsg("Files successfully uploaded !!");
             await updateMetadataFile(selectedFiles);
@@ -59,7 +54,7 @@ function FileUpload(props) {
         //TODO: add success/failure notification of uploading file(s)
     }
 
-    function makeMetaDataEntry(file){
+    function makeMetaDataEntry(file) {
         function getName(url) {
             let regex = /^https:\/\/pod\.inrupt\.com(\/\w+)*\/(\w+)/;
             const match = url.match(regex);
@@ -92,40 +87,20 @@ function FileUpload(props) {
         let processedEntries = Array.from(contentToAdd).map(entry => makeMetaDataEntry(entry));
         let metadataFile = makeMetadataFile(processedEntries);
         let file = await getFile(currentPath + metadataFile.name, {fetch: fetch});
-        let fileContent = null;
-        // should be as simple as:
-        // oldFileContent = getFile(url)
-        // contentToAppend = processedEntries
-        // processedEntries.forEach(entry => oldFileContent.push(entry))
-        //makeMetadataFile(oldFileContent);
-        // but it's not
+        let fileContent = await file.text();
 
-        file.text().then(text => {
-            console.log("unparsed text: ", text);
-            console.log("parse text:");
-            console.log(JSON.parse(text));
-            fileContent = JSON.parse(text);
-
-            //fileContent.push(contentToAdd);
-            console.log("printing the old file content");
-            //fileContent.push(processedEntries);
-            //processedEntries.forEach(entry => fileContent.push(entry));
-            fileContent = fileContent.concat(processedEntries);
-
-            console.log("printing the new file content");
-            console.log(fileContent);
-            metadataFile = makeMetadataFile(fileContent);
-        });
+        const prevContent = JSON.parse(fileContent);
+        const newContent = [...prevContent, ...processedEntries];
+        const resContent = await Promise.all(newContent);
+        const newMetadataFile = makeMetadataFile(resContent);
         const savedFile = await overwriteFile(
-            currentPath + metadataFile.name,
-            metadataFile,
+            currentPath + newMetadataFile.name,
+            newMetadataFile,
             {
-                slug: metadataFile.name,
-                contentType: metadataFile.type,
+                slug: newMetadataFile.name,
+                contentType: newMetadataFile.type,
                 fetch: fetch
             });
-
-        
     }
 
     /**
@@ -149,7 +124,7 @@ function FileUpload(props) {
             // await setNotifMsg("file '" + file.name + "' already exists.");
         } catch (error) {
             console.error("ERROR CAUGHT:", error);
-            
+
         }
     }
 
@@ -187,12 +162,12 @@ function FileUpload(props) {
             {showSelectedFiles()}
             <button className="Button" onClick={upload}>Upload</button>
             <input id="file-input" type="file" multiple="multiple"
-                name="fileUploadInput"
-                className="file-selection"
-                accept="image/*"
-                onChange={(e) => {
+                   name="fileUploadInput"
+                   className="file-selection"
+                   accept="image/*"
+                   onChange={(e) => {
                        setSelectedFiles(e.target.files);
-                }}/>
+                   }}/>
         </div>
     );
 }
