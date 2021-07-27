@@ -17,6 +17,24 @@ On the profile page (`Profile.js`), the user can find back their profile details
 ## Contacts
 The contacts page (`Contacts.js`) shows a list of the user's contacts. When the user clicks one of their contacts, the app redirects them to the contact details page of that contact (`ContactDetails.js`).
 
+## Uploading Images
+A user can add new images to the root folder of their Solid pod through the + at the top right corner of the app. The code for this functionality can be found in `FileUpload.js`. For each file that is being uploaded, a new entry in the `metadata.json` file is created.
+
+## Metadata.json File
+The `metadata.json` file is an index file that contains entries of everything (e.g. folders or files) that is in the root folder of the Solid pod. Every entry of the array has the following format:
+
+```json
+{
+"url":"https://pod.inrupt.com/<USERNAME>/<PATH>/<TO>/<IMG.jpg>",
+"shortName":"<IMG>",
+"isFolder":false,
+"imageUrl":"blob:http://<URL/TO/BLOB>",
+"date":"<YYYY-MM-DDTHH:mm:ss.sssZ>"
+}
+```
+
+
+
 # Tech Stack
 The project was made in [ReactJs](https://reactjs.org/) with the [Inrupt JavaScript client libraries](https://docs.inrupt.com/developer-tools/javascript/client-libraries/). However, you might also want to check out Inrupt's [Solid React SDK](https://docs.inrupt.com/developer-tools/javascript/react-sdk/).
 
