@@ -64,7 +64,7 @@ function Login(props) {
 
 	return (
 			<div className="login-frame">
-	    	<Button size="large" variant="contained" color="primary" onClick={loginToInruptDotCom}>Log in</Button>
+	    	<Button size="large" variant="contained" color="primary" onClick={loginToInruptDotCom}>Log in with Inrupt.com</Button>
 	    	<Button size="small" variant="outlined" color="default" style={{marginTop:"10px"}}
           onClick={event =>  window.location.href=GITHUB_PAGE_LINK}
           startIcon={<GitHubIcon/>}>
