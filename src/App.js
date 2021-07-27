@@ -15,7 +15,7 @@ const useStyles = makeStyles({
         right: "10px",
         bottom: "10px",
     },
-    topBarRightElem: {
+    topBarRightFirstElem: {
         marginLeft: 'auto',
     },
     appBar: {
