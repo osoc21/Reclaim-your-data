@@ -1,3 +1,5 @@
+
+import {IMAGE_RELATIVE_PATH} from "./constants"
 import React, {useEffect, useState} from "react";
 import GridView from "./GridView";
 import "./FileExplorer.css"
@@ -5,6 +7,14 @@ import {fetch} from '@inrupt/solid-client-authn-browser';
 import {getSolidDataset, getThingAll} from '@inrupt/solid-client';
 import {Container} from '@material-ui/core';
 
+
+/**
+ * The FileExplorer component fetches images and updates it's state
+ * once done. This allows a GridView to display the images, and can also be used
+ * to implement a files and folder navigation system.
+ * 
+ * @param {[type]} props [description]
+ */
 function FileExplorer(props) {
     const POD_URL = props.podUrl;
 
@@ -24,7 +34,11 @@ function FileExplorer(props) {
         });
     }
 
-
+    /**
+     * Takes an url and fetches all the files and containers at that location if possible.
+     * @param  {[type]} url The url of the container
+     * @return {[type]}     A list of file urls
+     */
     async function getFilesFromResourceURL(url) {
         const fetchedFiles = await getSolidDataset(url, {fetch: fetch});
         let children = await getThingAll(fetchedFiles);
@@ -40,12 +54,24 @@ function FileExplorer(props) {
     }
 
 
-    /** Fetch all files from the given path given relative to the root */
+
+
+    /** 
+     * Fetch all files from the given path given relative to the root
+     * @return void
+     */
     async function getRootFiles() {
+        let folderUrl = POD_URL + IMAGE_RELATIVE_PATH;
         await setLoadingAnim(true);
-        getFilesFromResourceURL(POD_URL).then((fileArray) => {
-            setCurrentPath(POD_URL);
+        getFilesFromResourceURL(folderUrl).then((fileArray) => {
+            setCurrentPath(folderUrl);
             setFiles(fileArray);
+            // if no files were obtained (empty folder)
+            // then stop loading animation directly
+            if (files.length === 0)
+            {
+                setLoadingAnim(false);
+            } 
         });
     }
 

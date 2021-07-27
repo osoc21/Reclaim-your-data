@@ -1,4 +1,6 @@
 import "./FileUpload.css"
+import {isFolderUrl, getFileNameFromUrl} from "./pod";
+
 import React, {useState} from "react"
 import {
     saveFileInContainer,
@@ -81,33 +83,11 @@ function FileUpload(props) {
      * @returns {{date: Date, isFolder: boolean, imageUrl: string, shortName: string, url: string}} `JS Object`
      */
     function makeMetaDataEntry(file) {
-        /**
-         * Return the name of the file associated with the provided URL.
-         *
-         * @param url {string} `URL to the file.`
-         * @returns {string} `Name of file.`
-         */
-        function getName(url) {
-            let regex = /^https:\/\/pod\.inrupt\.com(\/\w+)*\/(\w+)/;
-            const match = url.match(regex);
-            return match[match.length - 1];
-        }
-
-        /**
-         * Checks whether or not the provided URL is a folder.
-         *
-         * @param url {string} `URL`
-         * @returns {boolean} boolean
-         */
-        function isFolder(url) {
-            return url.endsWith("/");
-        }
-
         let fileUrl = currentPath + file.name;
         let metadataEntry = {
             url: fileUrl,
-            shortName: getName(fileUrl),
-            isFolder: isFolder(fileUrl),
+            shortName: file.name,
+            isFolder: isFolderUrl(fileUrl),
             imageUrl: null,
             date: null
         };
@@ -138,13 +118,23 @@ function FileUpload(props) {
     async function updateMetadataFile(newFileEntries) {
         let processedEntries = Array.from(newFileEntries).map(entry => makeMetaDataEntry(entry));
         let metadataFile = makeMetadataFile(processedEntries);
-        let file = await getFile(currentPath + metadataFile.name, {fetch: fetch});
-        let fileContent = await file.text();
+        let file = null;
+        let newMetadataFile = null;
 
-        const prevContent = JSON.parse(fileContent);
-        const newContent = [...prevContent, ...processedEntries];
-        const resContent = await Promise.all(newContent);
-        const newMetadataFile = makeMetadataFile(resContent);
+        try
+        {
+            file = await getFile(currentPath + metadataFile.name, {fetch: fetch});
+            let fileContent = await file.text();
+            const prevContent = JSON.parse(fileContent);
+            const newContent = [...prevContent, ...processedEntries];
+            const resContent = await Promise.all(newContent);
+            newMetadataFile = makeMetadataFile(resContent);
+        }
+        catch(error)
+        {
+            newMetadataFile = makeMetadataFile(processedEntries);
+        }
+
         const savedFile = await overwriteFile(
             currentPath + newMetadataFile.name,
             newMetadataFile,

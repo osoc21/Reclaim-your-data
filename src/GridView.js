@@ -31,7 +31,7 @@ function GridView(props) {
     let files = props.files;
     let setLoadingAnim = props.setLoadingAnim;
     const [entries, setEntries] = useState([]);
-    let [openImageUrl, setOpenImageUrl] = useState("");
+    let [openImageEntryIdx, setOpenImageEntryIdx] = useState(null);
     let currentPath = props.currentPath;
     let loadedImagesCounter = useRef(0);
     let nbImages = useRef(0);
@@ -65,17 +65,19 @@ function GridView(props) {
         return url.endsWith(".jpg") || url.endsWith(".jpeg") || url.endsWith(".png");
     }
 
-    /**
+    /*
+     *
      * Gets the name of the deepest folder or file in the url.
      * @param {String} url 
      * @returns {String} name of the deepest folder or file in the url
      */
-    function getName(url) {
-        let regex = /^https:\/\/pod\.inrupt\.com(\/\w+)*\/(\w+)/;
-        const match = url.match(regex);
-        // get last matched part in order to support nested folders
-        return match[match.length - 1];
-    }
+    // function getName(url) {
+    //     let regex = /^https:\/\/pod\.inrupt\.com(\/\w+)*\/(\w+)/;
+    //     const match = url.match(regex);
+    //     // get last matched part in order to support nested folders
+    //     return match[match.length - 1];
+    // }
+
 
     /**
      * Sorts files by descending dates
@@ -103,7 +105,6 @@ function GridView(props) {
         } 
  
         sortByDate(parsedContent);
-        
 
     }
 
@@ -114,10 +115,10 @@ function GridView(props) {
     async function fetchImageData(processedEntries) {
         for (const entry of processedEntries) {
             if (isImage(entry.url)) {
-                console.log("fetching EXIF");
                 let raw = await getFile(entry.url, {fetch: fetch});
                 entry.imageUrl = URL.createObjectURL(raw);
 
+                // console.log("fetching EXIF");
                 if(entry.date === null){
                     let arrayBuffer = await new Response(raw).arrayBuffer();
                     let exifData = exif.readFromBinaryFile(arrayBuffer);
@@ -168,17 +169,12 @@ function GridView(props) {
             let url = folderEntry.imageUrl;
 
             return (<ImageListItem key={idx}>
-                <img onLoad={updateLoadingAnim} loading="lazy" src={url} 
-                alt={url} onClick={(e) => {setOpenImageUrl(url)}}/>
-            </ImageListItem>);
+                        <img onLoad={updateLoadingAnim} loading="lazy" src={url} 
+                        alt={url} onClick={(e) => {setOpenImageEntryIdx(idx)}}/>
+                    </ImageListItem>);
         }
 
         return null;
-    }
-
-    function handleImageModalClose()
-    {
-        setOpenImageUrl("");
     }
 
 
@@ -214,22 +210,56 @@ function GridView(props) {
     });
 
 
+    /**
+     * Sets the image entry index state to null, closing the image details view.
+     * @return {[type]} [description]
+     */
+    async function handleImageModalClose()
+    {
+        await setOpenImageEntryIdx(null);
+    }
+
+    /**
+     * Simple convenience function that returns true if openImageEntryIdx
+     * is defined and not null.
+     * @return {[type]} A boolean telling if openImageEntryIdx is defined and not null
+     */
+    function canOpenImageDetail()
+    {
+        // zero is implicitely converted to false
+        // but zero is a valid index !!! so check for that particular case too
+        if (openImageEntryIdx || openImageEntryIdx === 0)
+        {
+            return true;
+        }
+        return false;
+    }
+
+
     function showOpenImage()
     {
-        if (openImageUrl)
+        if (canOpenImageDetail())
         {
+            let entry = entries[openImageEntryIdx];
+            let imgUrl = entry.imageUrl;
+            let imgName = entry.shortName;
+            let imgDate = entry.date;
+
             return (<Dialog style={{margin: "auto", 
                     display: "flex", justifyContent: "center", 
                     width:"100vw", height:"100vh"}}
                     TransitionComponent={Transition}
-                    open={() => {return openImageUrl !== ""}}
+                    open={() => {return canOpenImageDetail()}}
                     aria-labelledby="simple-modal-title"
                     aria-describedby="simple-modal-description">
                         <DialogTitle onClose={handleImageModalClose}>
-                            &nbsp;
+                            {imgName ? <p>{imgName}</p> : <>&nbsp;</>}
                         </DialogTitle>
                         <DialogContent style={{display:"flex", justifyContent:"center"}}>
-                            <img src={openImageUrl} alt={openImageUrl} style={{maxWidth:"100%", maxHeight: "100%"}}/>
+                            <img src={imgUrl} alt={imgUrl} style={{maxWidth:"80%", maxHeight: "80%"}}/>
+                        </DialogContent>
+                        <DialogContent dividers style={{overflow: "hidden"}}>
+                            {imgDate ? <p>Date:{imgDate}</p> : null}
                         </DialogContent>
                     </Dialog>);
         }
@@ -243,7 +273,8 @@ function GridView(props) {
     return (
         <div className="grid-view">
             <ImageList rowHeight={160} cols={4}>
-                {entries.map((folderEntry, index) => renderEntry(folderEntry, index))}
+                {entries.length > 0 ? entries.map((folderEntry, index) => renderEntry(folderEntry, index)) :
+                    <h4><i>Nothing to display</i></h4>}
                 {showOpenImage()}
             </ImageList>
         </div>
