@@ -1,6 +1,6 @@
 import React, {useEffect, useState, useRef} from "react";
 import {fetch} from '@inrupt/solid-client-authn-browser';
-import {getFile} from '@inrupt/solid-client';
+import {getFile,    overwriteFile} from '@inrupt/solid-client';
 import {ImageList, ImageListItem} from '@material-ui/core';
 import dms2dec from "dms2dec";
 import "./GridView.css";
@@ -8,7 +8,6 @@ import exif from 'exif-js';
 
 function GridView(props) {
     let files = props.files;
-    let openFolder = props.openFolder;
     let setLoadingAnim = props.setLoadingAnim;
     const [entries, setEntries] = useState([]);
     let currentPath = props.currentPath;
@@ -18,70 +17,103 @@ function GridView(props) {
     useEffect(() => {
         nbImages.current = 0;
         loadedImagesCounter.current = 0;
-        // here we use props prefix, otherwise setLoadingAnim is not recognized
-        getEntriesFromFiles(files);
+        readMetadataFile()
     }, [files]);
 
+    /**
+     * Checks if a url is the url of a folder.
+     * @param {String} url 
+     * @returns {Boolean}
+     */
     function isFolder(url) {
         return url.endsWith("/");
     }
 
+    /**
+     * Checks if a url is the url of an image.
+     * It currently supports .jpg/.jpeg/.png extentions.
+     * @param {String} url 
+     * @returns {Boolean}
+     */
     function isImage(url) {
         return url.endsWith(".jpg") || url.endsWith(".jpeg") || url.endsWith(".png");
     }
 
+    /**
+     * Gets the name of the deepest folder or file in the url.
+     * @param {String} url 
+     * @returns {String} name of the deepest folder or file in the url
+     */
     function getName(url) {
         let regex = /^https:\/\/pod\.inrupt\.com(\/\w+)*\/(\w+)/;
         const match = url.match(regex);
+        // get last matched part in order to support nested folders
         return match[match.length - 1];
     }
 
+    /**
+     * Sorts files by descending dates
+     * @param {FileList} files - list of files
+     * @returns {FileList} sorted list of files
+     */
     function sortByDate(files) {
         return files.sort((a, b) => b.date - a.date);
     }
 
-    async function getEntriesFromFiles(files) {
-        let processedEntries = [];
+    async function readMetadataFile(){
+        let dummyMetadataFile = new File([], "metadata.json", {
+            type: "application/json"
+        }); 
+        console.log(currentPath + dummyMetadataFile.name);
+        let metadataFile = await getFile(currentPath + dummyMetadataFile.name, {fetch: fetch});
+        let fileContent = await metadataFile.text();
+        const parsedContent = JSON.parse(fileContent);
 
-        for (const entry of files) {
-            let processedEntry = {
-                url: entry.url,
-                shortName: getName(entry.url),
-                isFolder: isFolder(entry.url),
-                imageUrl: null,
-                date: null
-            };
+        if(parsedContent.length > 0){
+            console.log("fetchingImageData");
+            await fetchImageData(parsedContent);
+            await setEntries(parsedContent);
+        } 
+ 
+        sortByDate(parsedContent);
+        
 
-            processedEntries.push(processedEntry);
-        }
-        await fetchImageData(processedEntries);
-        await setEntries(processedEntries);
-        sortByDate(processedEntries);
     }
 
+    /**
+     * Gets image file URL (Blob) and data like EXIF DateTime and potentially location from images stored on the Solid pod.
+     * @param {Object} processedEntries 
+     */
     async function fetchImageData(processedEntries) {
         for (const entry of processedEntries) {
             if (isImage(entry.url)) {
+                console.log("fetching EXIF");
                 let raw = await getFile(entry.url, {fetch: fetch});
                 entry.imageUrl = URL.createObjectURL(raw);
 
-                let arrayBuffer = await new Response(raw).arrayBuffer();
-                let exifData = exif.readFromBinaryFile(arrayBuffer);
-                if (exifData) {
-                    let dateTime = exifData.DateTime ? exifData.DateTime.replace(":", "/").replace(":", "/") : undefined
-                    //let latitude = exifData.GPSLatitude && exifData.GPSLatitude[0] ? exifData.GPSLatitude : null
-                    //let longitude = exifData.GPSLongitude && exifData.GPSLongitude[0] ? exifData.GPSLongitude : null
-                    //console.log(`exifdata`);
-                    //console.log(dateTime);
-                    entry.date = new Date(dateTime);
-                    if (exifData.latitude != null && exifData.longitude != null) {
-                        // note: the dms2dec lib expects 4 parameters, but we haven't found a way to parse if the picture
-                        // was taken in the NESW direction, so at the moment it's hardcoded
-                        // TODO: extract NESW direction from EXIF data
-                        //console.log(dms2dec(exifData.latitude, "N", exifData.longitude, "E"));
+                if(entry.date === null){
+                    let arrayBuffer = await new Response(raw).arrayBuffer();
+                    let exifData = exif.readFromBinaryFile(arrayBuffer);
+                    if (exifData) {
+                        let dateTime = exifData.DateTime ? exifData.DateTime.replace(":", "/").replace(":", "/") : undefined
+
+                        /*
+                        This is also the place where you would extract other EXIF data like location.
+                         */
+
+                        //let latitude = exifData.GPSLatitude && exifData.GPSLatitude[0] ? exifData.GPSLatitude : null
+                        //let longitude = exifData.GPSLongitude && exifData.GPSLongitude[0] ? exifData.GPSLongitude : null
+                        //console.log(`exifdata`);
+                        //console.log(dateTime);
+                        entry.date = new Date(dateTime);
+                        if (exifData.latitude != null && exifData.longitude != null) {
+                            // note: the dms2dec lib expects 4 parameters, but we haven't found a way to parse if the picture
+                            // was taken in the NESW direction, so at the moment it's hardcoded
+                            // TODO: extract NESW direction from EXIF data
+                            //console.log(dms2dec(exifData.latitude, "N", exifData.longitude, "E"));
+                        }
                     }
                 }
-                // sortByDate(processedEntries);
             }
         }
     }
@@ -95,6 +127,12 @@ function GridView(props) {
         }
     }
 
+    /**
+     * Makes an ImageListItem for each image.
+     * @param {Object} folderEntry - entry that needs to be rendered.
+     * @param {Number} idx - index of entry in array is used as key for React list item.
+     * @returns {ReactComponent} 
+     */
     function renderEntry(folderEntry, idx) {
         if ((!folderEntry.isFolder) && folderEntry.imageUrl) {
             return (<ImageListItem key={idx}>
@@ -104,6 +142,9 @@ function GridView(props) {
         return null;
     }
 
+    /**
+     * Renders the ImageList with ImageListItems to be shown in the app.
+     */
     return (
         <div className="grid-view">
             <ImageList rowHeight={160} cols={4}>
