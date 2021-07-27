@@ -35,8 +35,8 @@ function ContactDetails(props)
 	/**
 	 * Simple convenience function that parses a single result in the bindings of a query.
 	 * Ideally, this function should be replaced by functions from the inrupt client API (e.g. getThing).
-	 * @param  {[type]} bindings The results of the query, from which the result should be parsed
-	 * @return {[type]}          The parsed result
+	 * @param  {[Object]} bindings The results of the query, from which the result should be parsed
+	 * @return {[string]}          The parsed result
 	 */
 	function parseSingleResult(bindings)
 	{
@@ -47,7 +47,6 @@ function ContactDetails(props)
 	 * This function use hardcoded predicates to query the person file and get information
 	 * like the role, email or webid of a contact. This function could be refactored
 	 * to use functions and vocabulary (e.g. VCARD) from the inrupt library.
-	 * @return {[type]} [description]
 	 */
 	async function getContactDetailsFromPersonFile()
 	{
@@ -87,8 +86,8 @@ function ContactDetails(props)
 	/**
 	 * This functions displays a <p> element containing the argument if defined,
 	 * otherwise returns a <p> element containing a dash character.
-	 * @param  {[type]} field [description]
-	 * @return {[type]}       [description]
+	 * @param  {[type]} field A value to display
+	 * @return {[type]}       A <p> element containing either field or a dash
 	 */
 	function showField(field)
 	{

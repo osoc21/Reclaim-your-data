@@ -26,13 +26,10 @@ function BottomNavBar(props) {
      * Event handler called each time that the bottom navigation is clicked and a page switch
      * should take place. The gotoScreen function is then called and the the focus of the bottom
      * navigation is updated.
-     * @param  {[type]} event    [description]
-     * @param  {[type]} newValue [description]
-     * @return {[type]}          [description]
+     * @param  {[type]} event    The change event for the bottom navigation element
+     * @param  {[string]} newValue The new string value of the bottom navigation, which is the new path for the router
      */
     const handleChange = async (event, newValue) => {
-        // NOTICE: we false as last parameter of gotoScreen, because we consider all the navigation tabs independent
-    // and as such we want hidden parameters to be updated after the screen change to not cause errors
         await setLocation(newValue);
         await gotoScreen(newValue)
     };

@@ -5,14 +5,15 @@ import { Store } from "n3";
 const newEngine = require('@comunica/actor-init-sparql').newEngine;
 const queryEngine = newEngine();
 
-function printBindings(binding) {
-    const boundVariables = binding['_root'].entries.map(e => e[0]);
-    for (let variable of boundVariables){
-        console.log(variable, " | " ,binding.get(variable).value);
-    }
-}
-
-
+/**
+ * Takes a RDF query and a list of source urls, and executes the query on them
+ * before returning bindings for the results.
+ * The session object is needed to avoid errors with the header content type.
+ * @param  {[type]} query   The query to execute
+ * @param  {[type]} sources The source urls, pointing to turtle files
+ * @param  {[type]} session A session object reference
+ * @return {[type]}         The result bindings
+ */
 async function executeQuery (query, sources, session) {
     const comunicaSources = [];
 
@@ -45,4 +46,4 @@ async function executeQuery (query, sources, session) {
 }
 
 
-export  {printBindings, executeQuery};
+export  {executeQuery};

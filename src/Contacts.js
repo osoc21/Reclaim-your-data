@@ -25,7 +25,6 @@ function Contacts(props) {
      * Uses the pod url to fetch the people.ttl turtle file on the POD, subsequently being able
      * to query the file for contact names and their associated 'person-files'.
      * The result bindings are stored in a state variable. 
-     * @return {[type]} [description]
      */
     async function fetchContacts() {
         let getContactsBasicInfoSource = podURL + "contacts/people.ttl#this";
@@ -45,7 +44,9 @@ function Contacts(props) {
      * Notice that the person-file url is actually used to get the contact details, but is passed
      * to the router in a hidden way to have a clearer url displayed in the browser and avoid unescaped
      * character problems.
-     * @param {[type]} props [description]
+     * @param {[type]} props The bindings of the result
+     * @return {[type]} A div component containing an icon (ideally a profile pic) and the name of the contact,
+     * which can be clicked on to move to the contact details page
      */
     function Contact(props) {
         let binding = props.binding;

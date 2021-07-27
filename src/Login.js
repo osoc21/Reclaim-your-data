@@ -24,7 +24,11 @@ function Login(props) {
 
 	let session = null;
 
-	// 1a. Start Login Process. Call login() function.
+	/**
+	 * Function taken from the inrupt examples.
+	 * Starts the login process by calling the login() function.
+	 * @return {[type]} The result of the login
+	 */
 	function loginToInruptDotCom() {
 	  let chosenIssuer = "https://broker.pod.inrupt.com";
 	  return login({
@@ -34,8 +38,11 @@ function Login(props) {
 	  });
 	}
 
-	// 1b. Login Redirect. Call handleIncomingRedirect() function.
-	// When redirected after login, finish the process by retrieving session information.
+	/** 
+	 * Function taken from the inrupt examples.
+	 * When redirected after login, finish the process by retrieving session information.
+	 * This is done with the handleIncomingRedirect() function, and then using a session object.
+	 */
 	async function handleRedirectAfterLogin() {
 	  await handleIncomingRedirect();
 

@@ -36,7 +36,6 @@ function FileUpload(props) {
      * finish. Once all async operations are completed, the function checks if any of them
      * failed, and if so, displays an error notification. If every operation succeeds, displays
      * a success notification.
-     * @return {[type]} [description]
      */
     async function upload() {
         let promiseArray = [];
@@ -124,9 +123,9 @@ function FileUpload(props) {
 
     /**
      * Upload file into the targetContainer.
-     * @param  {[type]} file               [description]
-     * @param  {[type]} targetContainerURL [description]
-     * @return {[type]}                    [description]
+     * @param  {[type]} file               A javascript File object
+     * @param  {[type]} targetContainerURL The url of the POD container where the file should be placed
+     * @return {[string]}                  The name of the file
      */
     async function placeFileInContainer(file, targetContainerURL) {
         try {
@@ -145,6 +144,10 @@ function FileUpload(props) {
         }
     }
 
+    /**
+     * Triggers a click event on the input[type="file"] element so that
+     * the associated file selecion window can open.
+     */
     function openFileSelectionWindow() {
         document.querySelector("#file-input").click();
     }
@@ -162,6 +165,12 @@ function FileUpload(props) {
         return res;
     }
 
+    /**
+     * Displays the list of selected files as well as a button to send them
+     * to the POD. This returned component will be displayed only if
+     * file(s) were selected beforehand.
+     * @return {[div]} A div element containing the selected file(s) list and the upload button
+     */
     function showUploadSection() {
         return (
             <div className="upload-section">

@@ -70,10 +70,8 @@ function Home(props) {
      * then we first want to render the new page before assigning null to the routingHiddenParams state.
      * This is because the previous page might have a prop that references the routingHiddenParam state,
      * hence setting it to null while the component is still there would generate an error.
-     * @param  {[type]}  screenPath               [description]
-     * @param  {[type]}  hiddenParams             [description]
-     * @param  {Boolean} updateHiddenParamsBefore [description]
-     * @return {[type]}                           [description]
+     * @param  {[type]}  screenPath               The new path for the router, pushed to the history
+     * @param  {[type]}  hiddenParams             Params that will be used by the new page, but don't go in the path url
      */
     async function gotoScreen(screenPath, hiddenParams = null) {
         // hiddenParams is defined and not null
@@ -92,8 +90,12 @@ function Home(props) {
     }
 
     /**
-     * Displays a loading animation centered on the screen if the loadingAnim state is set to true.
-     * The animation is top level, hence it has a z-index higher than the other components.
+     * Displays a fixed loading animation centered on the screen when the loadingAnim state is set to true.
+     * The animation is top level, hence it has a z-index higher than the other components, and it floats
+     * as the user scrolls the page.
+     *
+     * @see {@link https://material-ui.com/api/circular-progress/}
+     * @return {[CircularProgress]}  A styled material-ui CircularProgress element
      */
     function showLoadingAnimation() {
         if (loadingAnim) {

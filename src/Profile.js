@@ -55,7 +55,6 @@ function Profile(props)
 	/**
 	 * Fetch the data of the user using the web id. The function is currently a mixture
 	 * of inrupt API functions and custom queries for the email.
-	 * @return {[type]} [description]
 	 */
 	async function getProfileData()
 	{
@@ -134,8 +133,8 @@ function Profile(props)
 	/**
 	 * This functions displays a <p> element containing the argument if defined,
 	 * otherwise returns a <p> element containing a dash character.
-	 * @param  {[type]} field [description]
-	 * @return {[type]}       [description]
+	 * @param  {[type]} field A value to display
+	 * @return {[type]}       A <p> element containing either field or a dash
 	 */
 	function showField(field)
 	{
