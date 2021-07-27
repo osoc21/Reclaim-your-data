@@ -6,6 +6,14 @@ import dms2dec from "dms2dec";
 import "./GridView.css";
 import exif from 'exif-js';
 
+
+/**
+ * The GridView component takes care of fetching images from the pod, getting
+ * their EXIF data at the same time, and display them in a grid.
+ * 
+ * @param {[type]} props [description]
+ * @returns {JSX.Element}
+ */
 function GridView(props) {
     let files = props.files;
     let setLoadingAnim = props.setLoadingAnim;
@@ -63,6 +71,7 @@ function GridView(props) {
     function sortByDate(files) {
         return files.sort((a, b) => b.date - a.date);
     }
+
 
     async function readMetadataFile(){
         let dummyMetadataFile = new File([], "metadata.json", {
@@ -123,7 +132,8 @@ function GridView(props) {
     }
 
     /** If called with a counter of loaded images higher than the size of the entries array,
-     * stops the loading animation. */
+     * stops the loading animation.
+     */
     function updateLoadingAnim() {
         loadedImagesCounter.current += 1;
         if (loadedImagesCounter >= nbImages) {
