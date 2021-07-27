@@ -1,12 +1,13 @@
 
+
 import './App.css';
 import Login from "./Login";
 import Home from "./Home";
 
 import React, {useState, useEffect} from "react";
+import {useHistory} from "react-router-dom";
 import {makeStyles} from "@material-ui/core/styles";
 
-import {useHistory} from "react-router-dom";
 
 // Style I want for fab, can add more - it's just a JS object
 const useStyles = makeStyles({
@@ -78,7 +79,9 @@ function App() {
      * @return {[type]} The login component
      */
     function getLoginComponent() {
-        return (<Login setWebId={setWebId} setLoggedIn={setLoggedIn} setPodUrl={setPodUrl}/>);
+        return (<>
+                <Login setWebId={setWebId} setLoggedIn={setLoggedIn} setPodUrl={setPodUrl}/>
+                </>);
     }
 
     /**

@@ -1,12 +1,12 @@
 
+import {GITHUB_PAGE_LINK} from "./constants";
+
 import React from "react";
 import {AppBar, Toolbar, Typography} from '@material-ui/core';
 import AddIcon from '@material-ui/icons/Add';
 import IconButton from '@material-ui/core/IconButton';
 import GitHubIcon from '@material-ui/icons/GitHub';
 
-
-const GITHUB_PAGE_LINK = "https://github.com/osoc21/Reclaim-your-data";
 
 /**
  * The MenuBar component represent a sticky bar at the top of the app, including

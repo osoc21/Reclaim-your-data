@@ -1,7 +1,10 @@
+
+import {GITHUB_PAGE_LINK} from "./constants";
 import "./Login.css";
 import {getPODUrlFromWebId} from './pod';
 import React from "react";
 import {Button} from '@material-ui/core';
+import GitHubIcon from '@material-ui/icons/GitHub';
 import {
   login,
   handleIncomingRedirect,
@@ -60,8 +63,10 @@ function Login(props) {
 	handleRedirectAfterLogin();
 
 	return (
-		<div className="login-frame">
-	    	<Button size="large" variant="contained" color="primary" onClick={loginToInruptDotCom}>Log-in</Button>
+			<div className="login-frame">
+	    	<Button size="large" variant="contained" color="primary" onClick={loginToInruptDotCom}>Log in</Button>
+	    	<GitHubIcon color="default" fontSize="large" style={{marginTop:"10px", cursor: "pointer"}}
+          onClick={event =>  window.location.href=GITHUB_PAGE_LINK}/>
     	</div>
 	);
 }
