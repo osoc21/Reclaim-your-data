@@ -96,6 +96,11 @@ function GridView(props) {
                     let exifData = exif.readFromBinaryFile(arrayBuffer);
                     if (exifData) {
                         let dateTime = exifData.DateTime ? exifData.DateTime.replace(":", "/").replace(":", "/") : undefined
+
+                        /*
+                        This is also the place where you would extract other EXIF data like location.
+                         */
+
                         //let latitude = exifData.GPSLatitude && exifData.GPSLatitude[0] ? exifData.GPSLatitude : null
                         //let longitude = exifData.GPSLongitude && exifData.GPSLongitude[0] ? exifData.GPSLongitude : null
                         //console.log(`exifdata`);
