@@ -4,10 +4,13 @@ The WePod Photo Web Application enables you to get back control over your photos
 
 # Functionalities
 ## Login
-A user can log in with their Inrupt.com account.
+A user can log in with their Inrupt.com account. When the user is logged in, the application logic is handled in the `Home.js` file.
 
 ## Photos
-When the user is logged in, they see an overview (grid view) of all the pictures that are stored in the root folder of their Solid pod. The routing is done with [React Router](https://reactrouter.com/) and happens in the `App.js` file. The implementation of the grid view itself can be found in `GridView.js`.
+When the user is logged in, they see an overview (grid view) of all the pictures that are stored in the root folder of their Solid pod.  The implementation of the grid view itself can be found in `GridView.js`.
+
+## Albums
+For now, the "Albums" button leads to a page with some dummy text. In the future the app could be expanded so that a Solid pod "collection" (or folder if you will) corresponds to an album. Each collection would then have a `metadata.json` file (read more on this in the Metadata section).
 
 # Tech Stack
 The project was made in [ReactJs](https://reactjs.org/) with the [Inrupt JavaScript client libraries](https://docs.inrupt.com/developer-tools/javascript/client-libraries/). However, you might also want to check out Inrupt's [Solid React SDK](https://docs.inrupt.com/developer-tools/javascript/react-sdk/).
