@@ -11,14 +11,12 @@ function GridView(props) {
     let setLoadingAnim = props.setLoadingAnim;
     const [entries, setEntries] = useState([]);
     let currentPath = props.currentPath;
-    // TODO: add comments
     let loadedImagesCounter = useRef(0);
     let nbImages = useRef(0);
 
     useEffect(() => {
         nbImages.current = 0;
         loadedImagesCounter.current = 0;
-        //getEntriesFromFiles(files);
         readMetadataFile()
     }, [files]);
 
@@ -75,60 +73,12 @@ function GridView(props) {
             console.log("fetchingImageData");
             await fetchImageData(parsedContent);
             await setEntries(parsedContent);
-        } /* else {
-            console.log("getting entries from files");
-            getEntriesFromFiles(files);
-        }
-        */
-
-        
+        } 
+ 
         sortByDate(parsedContent);
         
 
     }
-
-    /*
-
-    function makeMetadataFile(jsObjects) {
-        const jsonString = `${JSON.stringify(jsObjects)}`;
-        return new File([jsonString], "metadata.json", {
-            type: "application/json"
-        });
-    }
-
-    async function updateMetadataFile(processedEntries) {
-        let metadataFile = makeMetadataFile(processedEntries);
- 
-        const savedFile = await overwriteFile(
-            currentPath + metadataFile.name,
-            metadataFile,
-            {
-                slug: metadataFile.name,
-                contentType: metadataFile.type,
-                fetch: fetch
-            });
-    }
-
-    async function getEntriesFromFiles(files) {
-        let processedEntries = [];
-
-        for (const entry of files) {
-            let processedEntry = {
-                url: entry.url,
-                shortName: getName(entry.url),
-                isFolder: isFolder(entry.url),
-                imageUrl: null,
-                date: null
-            };
-
-            processedEntries.push(processedEntry);
-        }
-        await fetchImageData(processedEntries);
-        await setEntries(processedEntries);
-        updateMetadataFile(processedEntries);
-        //sortByDate(processedEntries);
-    }
-    */
 
     /**
      * Gets image file URL (Blob) and data like EXIF DateTime and potentially location from images stored on the Solid pod.
@@ -143,23 +93,22 @@ function GridView(props) {
 
                 if(entry.date === null){
                     let arrayBuffer = await new Response(raw).arrayBuffer();
-                let exifData = exif.readFromBinaryFile(arrayBuffer);
-                if (exifData) {
-                    let dateTime = exifData.DateTime ? exifData.DateTime.replace(":", "/").replace(":", "/") : undefined
-                    //let latitude = exifData.GPSLatitude && exifData.GPSLatitude[0] ? exifData.GPSLatitude : null
-                    //let longitude = exifData.GPSLongitude && exifData.GPSLongitude[0] ? exifData.GPSLongitude : null
-                    //console.log(`exifdata`);
-                    //console.log(dateTime);
-                    entry.date = new Date(dateTime);
-                    if (exifData.latitude != null && exifData.longitude != null) {
-                        // note: the dms2dec lib expects 4 parameters, but we haven't found a way to parse if the picture
-                        // was taken in the NESW direction, so at the moment it's hardcoded
-                        // TODO: extract NESW direction from EXIF data
-                        //console.log(dms2dec(exifData.latitude, "N", exifData.longitude, "E"));
+                    let exifData = exif.readFromBinaryFile(arrayBuffer);
+                    if (exifData) {
+                        let dateTime = exifData.DateTime ? exifData.DateTime.replace(":", "/").replace(":", "/") : undefined
+                        //let latitude = exifData.GPSLatitude && exifData.GPSLatitude[0] ? exifData.GPSLatitude : null
+                        //let longitude = exifData.GPSLongitude && exifData.GPSLongitude[0] ? exifData.GPSLongitude : null
+                        //console.log(`exifdata`);
+                        //console.log(dateTime);
+                        entry.date = new Date(dateTime);
+                        if (exifData.latitude != null && exifData.longitude != null) {
+                            // note: the dms2dec lib expects 4 parameters, but we haven't found a way to parse if the picture
+                            // was taken in the NESW direction, so at the moment it's hardcoded
+                            // TODO: extract NESW direction from EXIF data
+                            //console.log(dms2dec(exifData.latitude, "N", exifData.longitude, "E"));
+                        }
                     }
                 }
-                }
-                // sortByDate(processedEntries);
             }
         }
     }
