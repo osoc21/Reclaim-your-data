@@ -1,6 +1,5 @@
 # WePod Photo Web Application
 The WePod Photo Web Application enables you to get back control over your photos that are stored in your very own [Solid pod](https://signup.pod.inrupt.com/). The project is the result of a partnership between [IDLab](https://idlab.technology/) and [Open Summer of Code](https://osoc.be/) (OSOC21), an initiative of [Open Knowledge Belgium](https://openknowledge.be/). 
-<!-- More explanation of our own project -->
 
 # Functionalities
 ## Login
@@ -10,7 +9,13 @@ A user can log in with their Inrupt.com account. When the user is logged in, the
 When the user is logged in, they see an overview (grid view) of all the pictures that are stored in the root folder of their Solid pod.  The implementation of the grid view itself can be found in `GridView.js`.
 
 ## Albums
-For now, the "Albums" button leads to a page with some dummy text. In the future the app could be expanded so that a Solid pod "collection" (or folder if you will) corresponds to an album. Each collection would then have a `metadata.json` file (read more on this in the Metadata section).
+For now, the "Albums" button leads to a page with some dummy text (see `Albums.js`). In the future the app could be expanded so that a Solid pod "collection" (or folder if you will) corresponds to an album. Each collection would then have a `metadata.json` file (read more on this in the Metadata section).
+
+## Profile
+On the profile page (`Profile.js`), the user can find back their profile details such as their WebId, Pod URL, e-mail and the role of their Solid pod profile.
+
+## Contacts
+The contacts page (`Contacts.js`) shows a list of the user's contacts. When the user clicks one of their contacts, the app redirects them to the contact details page of that contact (`ContactDetails.js`).
 
 # Tech Stack
 The project was made in [ReactJs](https://reactjs.org/) with the [Inrupt JavaScript client libraries](https://docs.inrupt.com/developer-tools/javascript/client-libraries/). However, you might also want to check out Inrupt's [Solid React SDK](https://docs.inrupt.com/developer-tools/javascript/react-sdk/).
