@@ -2,6 +2,19 @@ import React, {useEffect, useState, useRef} from "react";
 import {fetch} from '@inrupt/solid-client-authn-browser';
 import {getFile,    overwriteFile} from '@inrupt/solid-client';
 import {ImageList, ImageListItem} from '@material-ui/core';
+import Modal from '@material-ui/core/Modal';
+import Container from '@material-ui/core/Container';
+import CloseIcon from '@material-ui/icons/Close';
+import IconButton from '@material-ui/core/IconButton';
+import MuiDialogTitle from '@material-ui/core/DialogTitle';
+import MuiDialogContent from '@material-ui/core/DialogContent';
+import MuiDialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import Dialog from '@material-ui/core/Dialog';
+import Grow from '@material-ui/core/Grow';
+import { withStyles } from '@material-ui/core/styles';
+import Typography from '@material-ui/core/Typography';
+
 import dms2dec from "dms2dec";
 import "./GridView.css";
 import exif from 'exif-js';
@@ -18,6 +31,7 @@ function GridView(props) {
     let files = props.files;
     let setLoadingAnim = props.setLoadingAnim;
     const [entries, setEntries] = useState([]);
+    let [openImageUrl, setOpenImageUrl] = useState("");
     let currentPath = props.currentPath;
     let loadedImagesCounter = useRef(0);
     let nbImages = useRef(0);
@@ -141,6 +155,7 @@ function GridView(props) {
         }
     }
 
+
     /**
      * Makes an ImageListItem for each image.
      * @param {Object} folderEntry - entry that needs to be rendered.
@@ -149,10 +164,76 @@ function GridView(props) {
      */
     function renderEntry(folderEntry, idx) {
         if ((!folderEntry.isFolder) && folderEntry.imageUrl) {
+
+            let url = folderEntry.imageUrl;
+
             return (<ImageListItem key={idx}>
-                <img onLoad={updateLoadingAnim} loading="lazy" src={folderEntry.imageUrl} alt={folderEntry.imageUrl}/>
+                <img onLoad={updateLoadingAnim} loading="lazy" src={url} 
+                alt={url} onClick={(e) => {setOpenImageUrl(url)}}/>
             </ImageListItem>);
         }
+
+        return null;
+    }
+
+    function handleImageModalClose()
+    {
+        setOpenImageUrl("");
+    }
+
+
+    const styles = (theme) => ({
+      root: {
+        margin: 0,
+        padding: theme.spacing(2),
+      },
+      closeButton: {
+        position: 'absolute',
+        right: theme.spacing(1),
+        top: theme.spacing(1),
+        color: theme.palette.grey[500],
+      },
+    });
+
+    const DialogTitle = withStyles(styles)((props) => {
+      const { children, classes, onClose, ...other } = props;
+      return (
+        <MuiDialogTitle disableTypography className={classes.root} {...other}>
+          <Typography variant="h6">{children}</Typography>
+          {onClose ? (
+            <IconButton aria-label="close" className={classes.closeButton} onClick={onClose}>
+              <CloseIcon color="secondary"/>
+            </IconButton>
+          ) : null}
+        </MuiDialogTitle>
+      );
+    });
+
+    const Transition = React.forwardRef(function Transition(props, ref) {
+        return <Grow timeout={6000} ref={ref} {...props} />;
+    });
+
+
+    function showOpenImage()
+    {
+        if (openImageUrl)
+        {
+            return (<Dialog style={{margin: "auto", 
+                    display: "flex", justifyContent: "center", 
+                    width:"100vw", height:"100vh"}}
+                    TransitionComponent={Transition}
+                    open={() => {return openImageUrl !== ""}}
+                    aria-labelledby="simple-modal-title"
+                    aria-describedby="simple-modal-description">
+                        <DialogTitle onClose={handleImageModalClose}>
+                            &nbsp;
+                        </DialogTitle>
+                        <DialogContent style={{display:"flex", justifyContent:"center"}}>
+                            <img src={openImageUrl} alt={openImageUrl} style={{maxWidth:"100%", maxHeight: "100%"}}/>
+                        </DialogContent>
+                    </Dialog>);
+        }
+
         return null;
     }
 
@@ -163,6 +244,7 @@ function GridView(props) {
         <div className="grid-view">
             <ImageList rowHeight={160} cols={4}>
                 {entries.map((folderEntry, index) => renderEntry(folderEntry, index))}
+                {showOpenImage()}
             </ImageList>
         </div>
     );
