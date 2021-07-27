@@ -3,6 +3,8 @@ The WePod Photo Web Application enables you to get back control over your photos
 
 <!-- More explanation of our own project -->
 
+# Tech Stack
+The project was made in [ReactJs](https://reactjs.org/) with the [Inrupt JavaScript client libraries](https://docs.inrupt.com/developer-tools/javascript/client-libraries/). However, you might also want to check out Inrupt's [Solid React SDK](https://docs.inrupt.com/developer-tools/javascript/react-sdk/).
 
 # Getting Started with Create React App
 
