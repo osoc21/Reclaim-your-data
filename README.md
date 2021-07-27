@@ -15,7 +15,6 @@ For now, the "Albums" button leads to a page with some dummy text. In the future
 # Tech Stack
 The project was made in [ReactJs](https://reactjs.org/) with the [Inrupt JavaScript client libraries](https://docs.inrupt.com/developer-tools/javascript/client-libraries/). However, you might also want to check out Inrupt's [Solid React SDK](https://docs.inrupt.com/developer-tools/javascript/react-sdk/).
 
-
 ## Setting up the application locally
 
 [Node.js](https://nodejs.org/en/download/) and NPM are needed to run the application locally. Make sure to have an updated version installed (Node v14 or greater, npm v6 or greater).
