@@ -17,7 +17,11 @@ function GridView(props) {
     useEffect(() => {
         nbImages.current = 0;
         loadedImagesCounter.current = 0;
-        readMetadataFile()
+
+        if (currentPath !== "")
+        {
+            readMetadataFile();
+        }
     }, [files]);
 
     /**
