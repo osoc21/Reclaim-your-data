@@ -90,21 +90,40 @@ function GridView(props) {
 
 
     async function readMetadataFile(){
-        let dummyMetadataFile = new File([], "metadata.json", {
+        // initialize the file with '[]' as text content so that
+        // the file is a valid JSON file
+        let dummyMetadataFile = new File(["[]"], "metadata.json", {
             type: "application/json"
         }); 
         console.log(currentPath + dummyMetadataFile.name);
-        let metadataFile = await getFile(currentPath + dummyMetadataFile.name, {fetch: fetch});
-        let fileContent = await metadataFile.text();
-        const parsedContent = JSON.parse(fileContent);
+        let metadataFile = dummyMetadataFile;
 
-        if(parsedContent.length > 0){
-            console.log("fetchingImageData");
-            await fetchImageData(parsedContent);
-            await setEntries(parsedContent);
-        } 
- 
-        sortByDate(parsedContent);
+        try
+        {
+            metadataFile = await getFile(currentPath + dummyMetadataFile.name, {fetch: fetch});
+            let fileContent = await metadataFile.text();
+            const parsedContent = JSON.parse(fileContent);
+
+            if(parsedContent.length > 0){
+                console.log("fetchingImageData");
+                await fetchImageData(parsedContent);
+                let sortedContent = sortByDate(parsedContent);
+                await setEntries(sortedContent);
+            } 
+     
+        }
+        // the metadata file does not exist, so we use the dummy
+        // metadata file and write it to the POD
+        catch(error)
+        {
+            const savedFile = await overwriteFile(currentPath + metadataFile.name,
+            metadataFile,
+            {
+                slug: metadataFile.name,
+                contentType: metadataFile.type,
+                fetch: fetch
+            });
+        }
 
     }
 
