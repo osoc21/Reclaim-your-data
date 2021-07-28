@@ -25,11 +25,11 @@ The `metadata.json` file is an index file that contains entries of everything (e
 
 ```json
 {
-"url":"https://pod.inrupt.com/<USERNAME>/<PATH>/<TO>/<IMG.jpg>",
-"shortName":"<IMG>",
-"isFolder":false,
-"imageUrl":"blob:http://<URL/TO/BLOB>",
-"date":"<YYYY-MM-DDTHH:mm:ss.sssZ>"
+  "url":"https://pod.inrupt.com/<USERNAME>/<PATH>/<TO>/<IMG.jpg>",
+  "shortName":"<IMG>",
+  "isFolder":false,
+  "imageUrl":"blob:http://<URL/TO/BLOB>",
+  "date":"<YYYY-MM-DDTHH:mm:ss.sssZ>"
 }
 ```
 
