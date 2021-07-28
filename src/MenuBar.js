@@ -25,7 +25,7 @@ function MenuBar(props) {
                     WePod
                 </Typography>
                 <GitHubIcon style={{cursor: "pointer"}} className={classes.topBarRightFirstElem} 
-                onClick={event =>  window.location.href=GITHUB_PAGE_LINK}/>
+                onClick={event =>  window.open(GITHUB_PAGE_LINK, '_blank', "", false) }/>
                 <IconButton style={{color: "white", marginLeft: "10px"}} edge="start"
                             aria-label="menu" onClick={async () => {
                     await gotoScreen('/upload')

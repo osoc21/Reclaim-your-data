@@ -259,7 +259,7 @@ function GridView(props) {
                             <img src={imgUrl} alt={imgUrl} style={{maxWidth:"80%", maxHeight: "80%"}}/>
                         </DialogContent>
                         <DialogContent dividers style={{overflow: "hidden"}}>
-                            {imgDate ? <p>Date:{imgDate}</p> : null}
+                            {imgDate ? <p>Date: {imgDate.toString()}</p> : <p>No date</p>}
                         </DialogContent>
                     </Dialog>);
         }
