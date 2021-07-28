@@ -1,6 +1,9 @@
+
 import React, {useEffect, useState, useRef} from "react";
+
 import {fetch} from '@inrupt/solid-client-authn-browser';
-import {getFile,    overwriteFile} from '@inrupt/solid-client';
+import {getFile, overwriteFile, deleteFile} from '@inrupt/solid-client';
+
 import {ImageList, ImageListItem} from '@material-ui/core';
 import Modal from '@material-ui/core/Modal';
 import Container from '@material-ui/core/Container';
@@ -14,6 +17,7 @@ import Dialog from '@material-ui/core/Dialog';
 import Grow from '@material-ui/core/Grow';
 import { withStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
+import Badge from '@material-ui/core/Badge';
 
 import dms2dec from "dms2dec";
 import "./GridView.css";
@@ -30,9 +34,16 @@ import exif from 'exif-js';
 function GridView(props) {
     let files = props.files;
     let setLoadingAnim = props.setLoadingAnim;
-    const [entries, setEntries] = useState([]);
-    let [openImageEntryIdx, setOpenImageEntryIdx] = useState(null);
+    let fileSelectMode = props.fileSelectMode;
+    let fileDeleteTriggered = props.fileDeleteTriggered;
+    let setFileDeleteTriggered = props.setFileDeleteTriggered;
     let currentPath = props.currentPath;
+    let setNotifMsg = props.setNotifMsg;
+    let setNotifType= props.setNotifType;
+
+    const [entries, setEntries] = useState([]);
+    let [entriesToDelete, setEntriesToDelete] = useState([]);
+    let [openImageEntryIdx, setOpenImageEntryIdx] = useState(null);
     let loadedImagesCounter = useRef(0);
     let nbImages = useRef(0);
 
@@ -45,6 +56,78 @@ function GridView(props) {
             readMetadataFile();
         }
     }, [files]);
+
+    useEffect(() => {
+        if (fileDeleteTriggered)
+        {
+            deleteSelectedFiles();
+        }
+    }, [fileDeleteTriggered]);
+
+    async function deleteFileFromUrl(fileUrl) {
+        try {
+            await deleteFile(fileUrl, { fetch: fetch });
+            return true;
+        } catch (error) {
+            console.log("could not delete '", fileUrl, "'");
+            //console.log("ERROR CAUGHT:", error);
+            // Any error is handled in the UI, no need to print it to the console.
+        }
+        return false;
+    }
+
+    async function deleteSelectedFiles()
+    {
+        console.log("deleting selected files ...");
+
+        await setLoadingAnim(true);
+
+        let promiseArray = [];
+
+        for (let entry of entries)
+        {
+            if (entry.isSelected)
+            {
+                promiseArray.push(deleteFileFromUrl(entry.url));
+            }
+        }
+
+        let promiseResults = await Promise.all(promiseArray);
+
+        let errorMsg = "";
+
+        for (let i = 0; i < promiseResults.length; ++i) {
+            let res = promiseResults[i];
+
+            // promise is false if the delete wasn't successful
+            if (!res) {
+                errorMsg += "'" + entries[i].shortName + "'";
+            }
+        }
+
+        await setLoadingAnim(false);
+
+        //there is an error or more
+        if (errorMsg !== "") {
+            await setNotifType("error");
+            await setNotifMsg("Could not delete the following file(s): " + errorMsg);
+        } else if (entries.length > 0) {
+            await setNotifType("success");
+            await setNotifMsg("Files successfully deleted !!");
+            // await updateMetadataFile(selectedFiles);
+        } else if (entries.length === 0) {
+            await setNotifType("info");
+            await setNotifMsg("Nothing to delete.");
+        }
+
+        // now we set back the flag to false
+        await setFileDeleteTriggered(false);
+
+        // remove deleted entries from the array !!
+        await setEntries(entries.filter((entry) => {return ! entry.isSelected}));
+
+    }
+
 
     /**
      * Checks if a url is the url of a folder.
@@ -136,6 +219,7 @@ function GridView(props) {
             if (isImage(entry.url)) {
                 let raw = await getFile(entry.url, {fetch: fetch});
                 entry.imageUrl = URL.createObjectURL(raw);
+                entry.isSelected = false;
 
                 // console.log("fetching EXIF");
                 if(entry.date === null){
@@ -183,14 +267,37 @@ function GridView(props) {
      * @returns {ReactComponent} 
      */
     function renderEntry(folderEntry, idx) {
+        function toggleSelectedEntryAt(idx)
+        {
+            let prevEntries = [ ...entries]; // shallow copy
+            prevEntries[idx].isSelected = ! prevEntries[idx].isSelected;
+            setEntries(prevEntries);
+        }
+
+        function handleRenderedEntryClick()
+        {
+            if (fileSelectMode)
+            {
+                toggleSelectedEntryAt(idx);
+            }
+            else
+            {
+                setOpenImageEntryIdx(idx);
+            }
+        }
+
         if ((!folderEntry.isFolder) && folderEntry.imageUrl) {
 
             let url = folderEntry.imageUrl;
+            let selected = folderEntry.isSelected;
+            let borderStyle = (selected ? "4px solid cyan" : "4px solid transparent");
 
-            return (<ImageListItem key={idx}>
+            return (
+                    <ImageListItem key={idx} style={{border: borderStyle}} >
                         <img onLoad={updateLoadingAnim} loading="lazy" src={url} 
-                        alt={url} onClick={(e) => {setOpenImageEntryIdx(idx)}}/>
-                    </ImageListItem>);
+                        alt={url} onClick={handleRenderedEntryClick}/>
+                    </ImageListItem>
+                   );
         }
 
         return null;
@@ -292,6 +399,7 @@ function GridView(props) {
     return (
         <div className="grid-view">
             <ImageList rowHeight={160} cols={4}>
+                {console.log("entries before render:", entries)}
                 {entries.length > 0 ? entries.map((folderEntry, index) => renderEntry(folderEntry, index)) :
                     <h4><i>Nothing to display</i></h4>}
                 {showOpenImage()}

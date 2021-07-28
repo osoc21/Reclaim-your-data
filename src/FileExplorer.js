@@ -23,6 +23,11 @@ function FileExplorer(props) {
     let setLoadingAnim = props.setLoadingAnim;
     let currentPath = props.explorerPath;
     let setCurrentPath = props.setExplorerPath;
+    let fileSelectMode = props.fileSelectMode;
+    let fileDeleteTriggered = props.fileDeleteTriggered;
+    let setFileDeleteTriggered = props.setFileDeleteTriggered;
+    let setNotifMsg = props.setNotifMsg;
+    let setNotifType = props.setNotifType;
 
     function openFolder(url) {
         setLoadingAnim(true);
@@ -33,6 +38,8 @@ function FileExplorer(props) {
             setLoadingAnim(false);
         });
     }
+
+    
 
     /**
      * Takes an url and fetches all the files and containers at that location if possible.
@@ -94,7 +101,11 @@ function FileExplorer(props) {
 
     return (
         <Container id="file-explorer" disableGutters="true">
-            <GridView files={files} openFolder={openFolder} setLoadingAnim={setLoadingAnim} currentPath={currentPath}/>
+            <GridView files={files} openFolder={openFolder}
+            setLoadingAnim={setLoadingAnim} currentPath={currentPath}
+            fileSelectMode={fileSelectMode}
+            fileDeleteTriggered={fileDeleteTriggered} setFileDeleteTriggered={setFileDeleteTriggered}
+            setNotifMsg={setNotifMsg} setNotifType={setNotifType}/>
         </Container>
     );
 }
