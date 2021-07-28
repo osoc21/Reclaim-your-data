@@ -46,7 +46,7 @@ The contacts are read-only in the WePod application, adding a contact can be don
 
 A user can add new images to the root folder of their Solid pod by clicking/tapping the `+` in the top right corner of the app. The code for this functionality can be found in `FileUpload.js`. For each file that is being uploaded, a new entry in the `metadata.json` file is created.
 
-Images are stored in the `/image` folder in the pod.
+Images are stored in the `/images` folder in the pod.
 
 ## Metadata.json File
 
