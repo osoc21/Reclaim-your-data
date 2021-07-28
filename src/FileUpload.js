@@ -142,7 +142,8 @@ function FileUpload(props) {
                 slug: newMetadataFile.name,
                 contentType: newMetadataFile.type,
                 fetch: fetch
-            });
+            }
+        );
     }
 
     /**

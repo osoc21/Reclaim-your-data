@@ -1,4 +1,6 @@
 
+import {METADATA_FILE_NAME} from "./constants";
+
 import React, {useEffect, useState, useRef} from "react";
 
 import {fetch} from '@inrupt/solid-client-authn-browser';
@@ -44,6 +46,7 @@ function GridView(props) {
     const [entries, setEntries] = useState([]);
     let [entriesToDelete, setEntriesToDelete] = useState([]);
     let [openImageEntryIdx, setOpenImageEntryIdx] = useState(null);
+    let [parsedMetadata, setParsedMetadata] = useState(null);
     let loadedImagesCounter = useRef(0);
     let nbImages = useRef(0);
 
@@ -123,8 +126,30 @@ function GridView(props) {
         // now we set back the flag to false
         await setFileDeleteTriggered(false);
 
+        // remove the elements from the metadata file (which will be updated
+        // on the POD afterwards). Requires the parsedMetadata array to be sorted
+        // exactly the same way as the entries, otherwise the indexes don't match !!!!!!!!!!
+        await setParsedMetadata(parsedMetadata.filter((elem, idx) => {
+            return ! entries[idx].isSelected;
+        }));
+
         // remove deleted entries from the array !!
         await setEntries(entries.filter((entry) => {return ! entry.isSelected}));
+
+        let metadataFile = new File(["[]"], METADATA_FILE_NAME, {
+            type: "application/json"
+        }); 
+
+        // overwrite the old metadata file
+        const savedFile = await overwriteFile(
+            currentPath + METADATA_FILE_NAME,
+            metadataFile,
+            {
+                slug: METADATA_FILE_NAME,
+                contentType: metadataFile.type,
+                fetch: fetch
+            }
+        );
 
     }
 
@@ -175,7 +200,7 @@ function GridView(props) {
     async function readMetadataFile(){
         // initialize the file with '[]' as text content so that
         // the file is a valid JSON file
-        let dummyMetadataFile = new File(["[]"], "metadata.json", {
+        let dummyMetadataFile = new File(["[]"], METADATA_FILE_NAME, {
             type: "application/json"
         }); 
         console.log(currentPath + dummyMetadataFile.name);
@@ -191,6 +216,10 @@ function GridView(props) {
                 console.log("fetchingImageData");
                 await fetchImageData(parsedContent);
                 let sortedContent = sortByDate(parsedContent);
+                // use same order as entries, but don't include the isSelected field !!
+                await setParsedMetadata(sortedContent);
+                // add the isSelected field to each entry before storing the array
+                initEntrySelectStatus(sortedContent);
                 await setEntries(sortedContent);
             } 
      
@@ -211,6 +240,20 @@ function GridView(props) {
     }
 
     /**
+     * Sets a isSelected attribute to each entry of the array passed as argument.
+     * @param  {[Object]} processedEntries Array containing entries, objects to which we can add attributes
+     * @return {void} Nothing
+     */
+    function initEntrySelectStatus(processedEntries)
+    {
+        for (const entry of processedEntries) {
+            if (isImage(entry.url)) {
+                entry.isSelected = false;
+            }
+        }
+    }
+
+    /**
      * Gets image file URL (Blob) and data like EXIF DateTime and potentially location from images stored on the Solid pod.
      * @param {Object} processedEntries 
      */
@@ -219,7 +262,7 @@ function GridView(props) {
             if (isImage(entry.url)) {
                 let raw = await getFile(entry.url, {fetch: fetch});
                 entry.imageUrl = URL.createObjectURL(raw);
-                entry.isSelected = false;
+                
 
                 // console.log("fetching EXIF");
                 if(entry.date === null){
