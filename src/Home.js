@@ -48,6 +48,16 @@ function Home(props) {
      */
     let [routingHiddenParams, setRoutingHiddenParams] = useState([]);
 
+    /**
+     * State used to enable or disable the file select mode.
+     */
+    let [fileSelectMode, setFileSelectMode] = useState(false);
+
+    /**
+     * State used to trigger a file delete operation for selected files.
+     */
+    let [fileDeleteTriggered, setFileDeleteTriggered] = useState(false);
+
     let webId = props.webId;
     let podUrl = props.podUrl;
     let explorerPath = props.explorerPath;
@@ -107,7 +117,9 @@ function Home(props) {
 
     return (<>
         {showLoadingAnimation()}
-        <MenuBar classes={classes} history={history} gotoScreen={gotoScreen}/>
+        <MenuBar classes={classes} history={history} gotoScreen={gotoScreen} 
+        fileSelectMode={fileSelectMode} setFileSelectMode={setFileSelectMode}
+        setFileDeleteTriggered={setFileDeleteTriggered}/>
         <Notification setNotifMsg={setNotifMsg} notifMsg={notifMsg} notifType={notifType}/>
         <div className="content">
             <Switch>
@@ -128,7 +140,10 @@ function Home(props) {
                 </Route>
                 <Route exact path="/">
                     <FileExplorer podUrl={podUrl} explorerPath={explorerPath}
-                                  setExplorerPath={setExplorerPath} setLoadingAnim={setLoadingAnim}/>
+                                  setExplorerPath={setExplorerPath} setLoadingAnim={setLoadingAnim}
+                                  fileSelectMode={fileSelectMode}
+                                  fileDeleteTriggered={fileDeleteTriggered} setFileDeleteTriggered={setFileDeleteTriggered}
+                                  setNotifMsg={setNotifMsg} setNotifType={setNotifType}/>
                 </Route>
             </Switch>
         </div>
