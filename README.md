@@ -15,6 +15,7 @@ The WePod Photo Web Application enables you to get back control over your photos
 - [Getting started](#getting-started)
   - [Setting up the application locally](#setting-up-the-application-locally)
   - [Running the application locally](#running-the-application-locally)
+  - [Deploying the application](#deploying-the-application)
 
 ---
 
@@ -111,3 +112,53 @@ This launches the application in your default web browser at the following addre
 Once launched, you can log in with your pod provider (only [Inrupt.com](https://podbrowser.inrupt.com/login) is supported at this time) and access your pod.
 
 *Note: The page will automatically reload if you make edits in the code and print any lint errors to the console.*
+
+## Deploying the application
+
+In order to deploy the application to GitHub Pages, we need a `homepage` entry in the `package.json` file like so:
+
+```json
+{
+  "name": "reclaim_your_data",
+  "version": "0.1.0",
+  "private": true,
+  "homepage": "https://wepod.osoc.be/"
+}
+```
+This homepage has to be the URL on which you will deploy the application.
+
+Install the `gh-pages` package:
+
+> `npm install gh-pages`
+
+Add the following scripts in `package.json`:
+
+```json
+{
+  "scripts": {
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build"
+  }
+}
+```
+
+The `predeploy` script will be run automatically before the `deploy` script.
+
+Deploy the application: 
+
+> `npm run deploy`
+
+Every time in the future that you make a change, simply run the `deploy` script.
+
+Finally, make sure GitHub Pages option in your GitHub project settings is set to use the gh-pages branch.
+
+*Optional:*
+
+You can configure a custom domain for GitHub Pages by adding a CNAME file in the `public` directory.
+
+> CNAME
+
+```text
+example.com
+```
+P.s.: if you're looking to deploy to other platforms, please follow the [Create React App](https://create-react-app.dev/docs/deployment/) deployment guide.
